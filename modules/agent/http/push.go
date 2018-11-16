@@ -36,6 +36,16 @@ func configPushRoutes() {
 			return
 		}
 
+		// shon.li
+		for i, x := range metrics {
+			if x.Endpoint == "UNKNOW~!@#$%^"  {
+				hostname, err := g.Hostname()
+				if  err == nil {
+					metrics[i].Endpoint = hostname
+				}
+			}
+		}
+		//end of shon.li
 		g.SendToTransfer(metrics)
 		w.Write([]byte("success"))
 	})
