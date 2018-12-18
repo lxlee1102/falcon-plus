@@ -16,9 +16,11 @@ package http
 
 import (
 	"encoding/json"
+	"net/http"
+
 	"github.com/open-falcon/falcon-plus/common/model"
 	"github.com/open-falcon/falcon-plus/modules/agent/g"
-	"net/http"
+	"github.com/open-falcon/falcon-plus/modules/agent/mcs"
 )
 
 func configPushRoutes() {
@@ -38,10 +40,15 @@ func configPushRoutes() {
 
 		// shon.li
 		for i, x := range metrics {
-			if x.Endpoint == "UNKNOW~!@#$%^"  {
+			if x.Endpoint == "UNKNOW~!@#$%^" {
 				hostname, err := g.Hostname()
-				if  err == nil {
+				if err == nil {
 					metrics[i].Endpoint = hostname
+				}
+				if g.Config().MCSTenant.Enabled {
+					if mcs.HasMetricPrefix(metrics[i].Metric) {
+						metrics[i].Tags = mcs.MCSRemovePortTag(metrics[i].Tags)
+					}
 				}
 			}
 		}

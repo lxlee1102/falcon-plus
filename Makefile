@@ -4,6 +4,7 @@ PACKAGES ?= $(shell go list ./... | grep -v /vendor/)
 GOFILES := $(shell find . -name "*.go" -type f -not -path "./vendor/*")
 GOFMT ?= gofmt "-s"
 VERSION := $(shell cat VERSION)
+DTVERSION := $(shell cat DTVERSION)
 
 all: $(CMD) $(TARGET)
 
@@ -67,7 +68,7 @@ pack: checkbin
 	@mkdir out/graph/data
 	@bash ./config/confgen.sh
 	@cp $(TARGET) ./out/$(TARGET)
-	tar -C out -zcf open-falcon-v$(VERSION).tar.gz .
+	tar -C out -zcf open-falcon-v$(VERSION).$(DTVERSION).tar.gz .
 	@rm -rf out
 
 pack4docker: checkbin

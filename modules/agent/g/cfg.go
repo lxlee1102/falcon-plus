@@ -55,6 +55,15 @@ type CollectorConfig struct {
 	MountPoint  []string `json:"mountPoint"`
 }
 
+// for MCS Tenant by shon.li
+type MCSTenantConfig struct {
+	Enabled      bool     `json:"enabled"`
+	TTL          int      `json:"ttl"`
+	Dir          string   `json:"dir"`
+	Suffix       string   `json:"suffix"`
+	MetricPrefix []string `json:"metricPrefix"`
+}
+
 type GlobalConfig struct {
 	Debug         bool              `json:"debug"`
 	Hostname      string            `json:"hostname"`
@@ -66,6 +75,9 @@ type GlobalConfig struct {
 	Collector     *CollectorConfig  `json:"collector"`
 	DefaultTags   map[string]string `json:"default_tags"`
 	IgnoreMetrics map[string]bool   `json:"ignore"`
+
+	// for mcs tenant, by shon.li
+	MCSTenant *MCSTenantConfig `json:"mcstenant"`
 }
 
 var (

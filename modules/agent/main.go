@@ -17,11 +17,13 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
+
 	"github.com/open-falcon/falcon-plus/modules/agent/cron"
 	"github.com/open-falcon/falcon-plus/modules/agent/funcs"
 	"github.com/open-falcon/falcon-plus/modules/agent/g"
 	"github.com/open-falcon/falcon-plus/modules/agent/http"
-	"os"
+	"github.com/open-falcon/falcon-plus/modules/agent/mcs"
 )
 
 func main() {
@@ -63,6 +65,8 @@ func main() {
 	cron.SyncBuiltinMetrics()
 	cron.SyncTrustableIps()
 	cron.Collect()
+
+	go mcs.MCSTenantUpdate()
 
 	go http.Start()
 
