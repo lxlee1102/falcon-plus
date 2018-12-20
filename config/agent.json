@@ -50,5 +50,12 @@
         "mem.swaptotal": true,
         "mem.swapused": true,
         "mem.swapfree": true
+    },
+    "mcstenant": {
+        "enabled": true,
+        "ttl": 120,
+        "dir": "/etc/openvpn",
+        "suffix": ".conf",
+        "metricPrefix": ["mcs.rcu"]
     }
 }
