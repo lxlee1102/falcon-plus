@@ -83,8 +83,11 @@ func MCSRemovePortTag(otags string) string {
 
 	if id == 0 {
 		nid, ok := TenantPortMap()[port]
-		if ok == false {
+		if ok {
 			id = nid
+		} else {
+			log.Errorf("MCS: cannot found port(%d)'s tenant",
+				port)
 		}
 	}
 
@@ -97,6 +100,8 @@ func MCSRemovePortTag(otags string) string {
 	if b2.Len() > 0 {
 		b1.WriteString(b2.String())
 	}
+
+	log.Debugf("MCS: origin-tag:%s, new-tag:%s", otags, b1.String())
 
 	return b1.String()
 }
