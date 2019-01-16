@@ -16,6 +16,7 @@ package cron
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 	"time"
 
@@ -75,6 +76,8 @@ func Callback(event *model.Event, action *api.Action) string {
 		for k, v := range event.PushedTags {
 			L = append(L, fmt.Sprintf("%s:%s", k, v))
 		}
+		//add by shon 2019/1/16
+		sort.Strings(L)
 	}
 
 	tags := ""
