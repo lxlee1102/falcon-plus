@@ -14,6 +14,9 @@ start_graph() {
 		falcon-$1
 
 	docker ps -f name=$1
+
+	docker exec falcon-$1 ./falconctl start
+	docker exec falcon-$1 ps aux
 }
 
 start_hbs() {
@@ -26,6 +29,9 @@ start_hbs() {
 		falcon-$1
 
 	docker ps -f name=$1
+
+	docker exec falcon-$1 ./falconctl start
+	docker exec falcon-$1 ps aux
 }
 
 
@@ -41,6 +47,9 @@ start_judge() {
 		falcon-$1
 
 	docker ps -f name=$1
+
+	docker exec falcon-$1 ./falconctl start
+	docker exec falcon-$1 ps aux
 }
 
 
@@ -58,6 +67,9 @@ start_transfer() {
 		falcon-$1
 
 	docker ps -f name=$1
+
+	docker exec falcon-$1 ./falconctl start
+	docker exec falcon-$1 ps aux
 }
 
 
@@ -72,6 +84,9 @@ start_api() {
 		falcon-$1
 
 	docker ps -f name=$1
+
+	docker exec falcon-$1 ./falconctl start
+	docker exec falcon-$1 ps aux
 }
 
 start_nodata() {
@@ -87,6 +102,9 @@ start_nodata() {
 		falcon-$1
 
 	docker ps -f name=$1
+
+	docker exec falcon-$1 ./falconctl start
+	docker exec falcon-$1 ps aux
 }
 
 
@@ -102,6 +120,9 @@ start_aggregator() {
 		falcon-$1
 
 	docker ps -f name=$1
+
+	docker exec falcon-$1 ./falconctl start
+	docker exec falcon-$1 ps aux
 }
 
 
@@ -144,6 +165,9 @@ start_alarm() {
 		falcon-$1
 
 	docker ps -f name=$1
+
+	docker exec falcon-$1 ./falconctl start
+	docker exec falcon-$1 ps aux
 }
 
 start_gateway() {
@@ -157,6 +181,9 @@ start_gateway() {
 		falcon-$1
 
 	docker ps -f name=$1
+
+	docker exec falcon-$1 ./falconctl start
+	docker exec falcon-$1 ps aux
 }
 
 start_agent() {
@@ -170,6 +197,9 @@ start_agent() {
 		falcon-$1
 
 	docker ps -f name=$1
+
+	docker exec falcon-$1 ./falconctl start
+	docker exec falcon-$1 ps aux
 }
 
 usage() {
