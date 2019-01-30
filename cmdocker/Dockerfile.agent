@@ -1,0 +1,21 @@
+FROM alpine:latest as agent
+USER root
+
+ENV FALCON_MODULES="agent" \
+    FALCON_DIR=/open-falcon 
+
+RUN mkdir -p $FALCON_DIR && \
+    mkdir -p $FALCON_DIR/logs && \
+    apk add --no-cache ca-certificates bash git supervisor
+
+COPY . $FALCON_DIR
+COPY ./zoneinfo.zip /usr/local/go/lib/time/ 
+WORKDIR $FALCON_DIR
+
+RUN mv supervisord.conf.agent /etc/supervisord.conf && \
+    rm -rf Dockerfile* *.zip
+
+EXPOSE 1988
+
+# Start
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]

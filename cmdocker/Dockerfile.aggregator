@@ -1,0 +1,21 @@
+FROM alpine:latest as aggregator
+USER root
+
+ENV FALCON_MODULES="aggregator" \
+    FALCON_DIR=/open-falcon 
+
+RUN mkdir -p $FALCON_DIR && \
+    mkdir -p $FALCON_DIR/logs && \
+    apk add --no-cache ca-certificates bash supervisor
+
+COPY . $FALCON_DIR
+WORKDIR $FALCON_DIR
+
+RUN mv supervisord.conf.aggregator /etc/supervisord.conf && \
+    mv zoneinfo.zip /usr/local/go/lib/time/zoneinfo.zip && \
+    rm -rf Dockerfile* *.zip
+
+EXPOSE 6055
+
+# Start
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]

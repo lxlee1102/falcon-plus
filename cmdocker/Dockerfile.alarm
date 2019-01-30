@@ -1,0 +1,21 @@
+FROM alpine:latest as alarm
+USER root
+
+ENV FALCON_MODULES="alarm" \
+    FALCON_DIR=/open-falcon 
+
+RUN mkdir -p $FALCON_DIR && \
+    mkdir -p $FALCON_DIR/logs && \
+    apk add --no-cache ca-certificates bash supervisor
+
+COPY . $FALCON_DIR
+COPY ./zoneinfo.zip /usr/local/go/lib/time/ 
+WORKDIR $FALCON_DIR
+
+RUN mv supervisord.conf.alarm /etc/supervisord.conf && \
+    rm -rf Dockerfile*  *.zip
+
+EXPOSE 9912
+
+# Start
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]

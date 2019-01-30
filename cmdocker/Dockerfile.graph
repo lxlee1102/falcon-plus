@@ -1,0 +1,20 @@
+FROM alpine:latest as graph
+USER root
+
+ENV FALCON_MODULES="graph" \
+    FALCON_DIR=/open-falcon 
+
+RUN mkdir -p $FALCON_DIR && \
+    mkdir -p $FALCON_DIR/logs && \
+    apk add --no-cache ca-certificates bash supervisor
+
+COPY . $FALCON_DIR
+WORKDIR $FALCON_DIR
+
+RUN mv supervisord.conf.graph /etc/supervisord.conf && \
+    rm -rf Dockerfile* *.zip
+
+EXPOSE 6071 6070
+
+# Start
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]

@@ -1,0 +1,20 @@
+FROM alpine:latest as gateway
+USER root
+
+ENV FALCON_MODULES="gateway" \
+    FALCON_DIR=/open-falcon 
+
+RUN mkdir -p $FALCON_DIR && \
+    mkdir -p $FALCON_DIR/logs && \
+    apk add --no-cache ca-certificates bash supervisor
+
+COPY . $FALCON_DIR
+WORKDIR $FALCON_DIR
+
+RUN mv supervisord.conf.gateway /etc/supervisord.conf && \
+    rm -rf Dockerfile*
+
+EXPOSE 16060 18433 14444
+
+# Start
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
