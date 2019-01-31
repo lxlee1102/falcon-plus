@@ -1,4 +1,4 @@
-FROM alpine:latest as gateway
+FROM alpine:3.7 as gateway
 USER root
 
 ENV FALCON_MODULES="gateway" \

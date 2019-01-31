@@ -4,10 +4,10 @@
     "hosts": "",
     "maxConns": 20,
     "maxIdle": 15,
-    "listen": "0.0.0.0:6031",
+    "listen": "0.0.0.0:6030",
     "trustable": [""],
     "http": {
         "enabled": true,
-        "listen": "0.0.0.0:6030"
+        "listen": "0.0.0.0:6031"
     }
 }

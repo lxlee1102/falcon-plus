@@ -1,4 +1,4 @@
-FROM alpine:latest as graph
+FROM alpine:3.7 as graph
 USER root
 
 ENV FALCON_MODULES="graph" \

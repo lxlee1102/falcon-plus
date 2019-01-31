@@ -1,4 +1,4 @@
-FROM alpine:latest as agent
+FROM alpine:3.7 as agent
 USER root
 
 ENV FALCON_MODULES="agent" \

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DB_PWD=123456
+DB_PWD=test123456
 
 start_graph() {
 	docker run -itd --name falcon-$1 \
@@ -62,7 +62,7 @@ start_transfer() {
 		-p 8433:8433 \
 		-e MYSQL_PORT=root:$DB_PWD@tcp\(db.falcon:3306\) \
 		-e GRAPH_CLUSTER="\"g01\": \"g01.falcon:6070\"" \
-		-e JUDGE_CLUSTER="\"j01\": \"j01.falcon:6070\"" \
+		-e JUDGE_CLUSTER="\"j01\": \"j01.falcon:6080\"" \
 		-v /home/work/open-falcon/logs:/open-falcon/logs \
 		falcon-$1
 
@@ -77,6 +77,7 @@ start_api() {
 	## run falcon-api container
 	docker run -itd --name falcon-$1 \
 		--link=falcon-mysql:db.falcon \
+		--link=falcon-graph:g01.falcon \
 		-p 8080:8080 \
 		-e MYSQL_PORT=root:$DB_PWD@tcp\(db.falcon:3306\) \
 		-e GRAPH_CLUSTER="\"g01\": \"g01.falcon:6070\"" \
@@ -130,17 +131,17 @@ start_dashboard() {
 	docker run -itd --name falcon-$1 \
 		-p 8081:8081 \
 		--link=falcon-mysql:db.falcon \
-		--link=falcon-plus:api.falcon \
+		--link=falcon-api:api.falcon \
 		-e API_ADDR=http://api.falcon:8080/api/v1 \
 		-e PORTAL_DB_HOST=db.falcon \
 		-e PORTAL_DB_PORT=3306 \
 		-e PORTAL_DB_USER=root \
-		-e PORTAL_DB_PASS=test123456 \
+		-e PORTAL_DB_PASS=$DB_PWD \
 		-e PORTAL_DB_NAME=falcon_portal \
 		-e ALARM_DB_HOST=db.falcon \
 		-e ALARM_DB_PORT=3306 \
 		-e ALARM_DB_USER=root \
-		-e ALARM_DB_PASS=test123456 \
+		-e ALARM_DB_PASS=$DB_PWD \
 		-e ALARM_DB_NAME=alarms \
 		-w /open-falcon/dashboard openfalcon/falcon-dashboard:v0.2.1  \
 		'./control startfg'
@@ -193,6 +194,7 @@ start_agent() {
 		-p 1988:1988 \
 		-e TRANSFER_RPC="\"t01.falcon:8433\"" \
 		-e HBS_PORT=hbs.falcon:6030 \
+		-e HOSTNAME=dockeragent01 \
 		-v /home/work/open-falcon/logs:/open-falcon/logs \
 		falcon-$1
 
@@ -210,6 +212,7 @@ Usage:
 
 commands:
     graph hbs judge transfer nodata aggregator agent gateway api alarm
+    all        all module start in order.
     "
 }
 
@@ -248,6 +251,20 @@ case $module in
 	 ;;
 
 	 "agent") start_agent $1
+	 ;;
+
+	"all")
+		start_graph graph
+		start_hbs hbs
+		start_judge judge
+		start_transfer transfer
+		start_api api
+		start_nodata nodata
+		start_aggregator aggregator
+		start_dashboard dashboard
+		start_alarm alarm
+		start_gateway gateway
+		start_agent agent
 	 ;;
 
 	 *) usage

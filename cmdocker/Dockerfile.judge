@@ -1,4 +1,4 @@
-FROM alpine:latest as judge
+FROM alpine:3.7 as judge
 USER root
 
 ENV FALCON_MODULES="judge" \

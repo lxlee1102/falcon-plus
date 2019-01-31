@@ -1,10 +1,11 @@
 ## building open-falcon modules docker image
 
-`the latest version in docker hub is v0.2.1`
+`the latest version in docker hub is v0.2.1-dt1.2.1`
 
 ##### 1. Building and running a builder to compile open-falcon in alpine
 ```
-    ## start mysql in container
+
+    ## start mysql in container by cammands, and a pure DB will be created.
     docker run -itd \
         --name falcon-mysql \
         -v /home/work/mysql-data:/var/lib/mysql \
@@ -12,7 +13,12 @@
         -p 3306:3306 \
         mysql:5.7
 
-    ## init mysql table before the first running
+    ## init mysql table before the first running, by MGC URL, include default templates.
+    wget --no-check-certificate --http-user=vbn --http-passwd=cmvbn@2016 \
+        https://release.slink.datadn.net/download/openfalcon/falcon-docker-db-init.sh && \
+        sh falcon-docker-db-init.sh test123456 && rm -f falcon-docker-db-init.sh
+
+    ## init mysql table before the first running, by falcon origin URL.
     cd /tmp && \
     git clone --depth=1 https://github.com/open-falcon/falcon-plus && \
     cd /tmp/falcon-plus/ && \
@@ -33,7 +39,7 @@ docker run --name falcon-redis -p6379:6379 -d redis:4-alpine3.8
 
 ```
     ## pull images from hub.docker.com/openfalcon
-    docker pull openfalcon/falcon-plus:v0.2.1
+    docker pull 103.235.247.247/vbn/falcon-plus:v0.2.1.dt1.2
     
     ## run falcon-plus container
     docker run -itd --name falcon-plus \
@@ -45,7 +51,7 @@ docker run --name falcon-redis -p6379:6379 -d redis:4-alpine3.8
         -e REDIS_PORT=redis.falcon:6379  \
         -v /home/work/open-falcon/data:/open-falcon/data \
         -v /home/work/open-falcon/logs:/open-falcon/logs \
-        openfalcon/falcon-plus:v0.2.1
+        103.235.247.247/vbn/falcon-plus:v0.2.1.dt1.2
     
     ## start falcon backend modules, such as graph,api,etc.
     docker exec falcon-plus sh ctrl.sh start \
@@ -230,7 +236,7 @@ docker run --name falcon-redis -p6379:6379 -d redis:4-alpine3.8
     docker run -itd --name falcon-dashboard \
         -p 8081:8081 \
         --link=falcon-mysql:db.falcon \
-        --link=falcon-plus:api.falcon \
+        --link=falcon-api:api.falcon \
         -e API_ADDR=http://api.falcon:8080/api/v1 \
         -e PORTAL_DB_HOST=db.falcon \
         -e PORTAL_DB_PORT=3306 \
@@ -256,6 +262,7 @@ docker run --name falcon-redis -p6379:6379 -d redis:4-alpine3.8
         -e USERNAME=noc@xxxx.com \
         -e PASSWD=123456 \
         -e FROM=falcon@xxxx.com \
+        -v /home/work/open-falcon/logs:/open-falcon/logs \
         falcon-mail
 
     ## or you can just start/stop/restart mail:
@@ -306,5 +313,6 @@ docker run --name falcon-redis -p6379:6379 -d redis:4-alpine3.8
     git clone https://github.com/lxlee1102/mail-provider.git && \
     cd mail-provider.git
 
+    go ./...
     docker build -t falcon-mail .
 ```

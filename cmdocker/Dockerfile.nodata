@@ -1,4 +1,4 @@
-FROM alpine:latest as nodata
+FROM alpine:3.7 as nodata
 USER root
 
 ENV FALCON_MODULES="nodata" \

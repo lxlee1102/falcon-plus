@@ -1,4 +1,4 @@
-FROM alpine:latest as transfer
+FROM alpine:3.7 as transfer
 USER root
 
 ENV FALCON_MODULES="transfer" \

@@ -1,4 +1,4 @@
-FROM alpine:latest as alarm
+FROM alpine:3.7 as alarm
 USER root
 
 ENV FALCON_MODULES="alarm" \
