@@ -43,7 +43,7 @@ Usage:
 
 commands:
     graph hbs judge transfer nodata aggregator agent gateway api alarm
-    all        all module start in order.
+    all        all module stop in order.
     "
 }
 
