@@ -2,7 +2,7 @@
 
 `the latest version in docker hub is v0.2.1-dt1.2.1`
 
-##### 1. Building and running a builder to compile open-falcon in alpine
+##### 1. Start mysql in container
 ```
 
     ## start mysql in container by cammands, and a pure DB will be created.
@@ -70,7 +70,9 @@ docker run --name falcon-redis -p6379:6379 -d redis:4-alpine3.8
 ##### 4. Start falcon-plus modules in multi-contrainer
 ```
     ## pull modules
-    docker pull $docker-resp/falcon-xxx
+    VERSION=v0.2.1.dt1.2.1
+    REPO=103.235.247.247/vbn/falcon-modules
+    docker pull $REPO/${MODULE-NAME}:$VERSION
 
     ## run falcon-graph container
     
@@ -82,7 +84,7 @@ docker run --name falcon-redis -p6379:6379 -d redis:4-alpine3.8
         -e GRAPH_CLUSTER="\"g01\": \"127.0.0.1:6070\"" \
         -v /home/work/open-falcon/data:/open-falcon/graph/data \
         -v /home/work/open-falcon/logs:/open-falcon/logs \
-        falcon-graph
+        $REPO/falcon-graph:$VERSION
 
         ### note: add multi graph and judge  
         -e GRAPH_CLUSTER="\"g01\": \"g01.falcon:6070\", \"g02\": \"g02.falcon:6070\"" \
@@ -95,7 +97,7 @@ docker run --name falcon-redis -p6379:6379 -d redis:4-alpine3.8
         -p 6031:6031 \
         -e MYSQL_PORT=root:test123456@tcp\(db.falcon:3306\) \
         -v /home/work/open-falcon/logs:/open-falcon/logs \
-        falcon-hbs
+        $REPO/falcon-hbs:$VERSION
 
 
     ## run falcon-judge container
@@ -107,7 +109,7 @@ docker run --name falcon-redis -p6379:6379 -d redis:4-alpine3.8
         -e HBS_PORT=hbs.falcon:6030 \
         -e REDIS_PORT=redis.falcon:6379  \
         -v /home/work/open-falcon/logs:/open-falcon/logs \
-        falcon-judge
+        $REPO/falcon-judge:$VERSION
 
     
     ## run falcon-transfer container
@@ -121,7 +123,7 @@ docker run --name falcon-redis -p6379:6379 -d redis:4-alpine3.8
         -e GRAPH_CLUSTER="\"g01\": \"g01.falcon:6070\"" \
         -e JUDGE_CLUSTER="\"j01\": \"j01.falcon:6080\"" \
         -v /home/work/open-falcon/logs:/open-falcon/logs \
-        falcon-transfer
+        $REPO/falcon-transfer:$VERSION
 
         ### note: add multi graph and judge  
         -e TRANSFER_CLUSTER="\"g01\": \"g01.falcon:6070\", \"g02\": \"g02.falcon:6070\"" \
@@ -135,7 +137,7 @@ docker run --name falcon-redis -p6379:6379 -d redis:4-alpine3.8
         -e MYSQL_PORT=root:test123456@tcp\(db.falcon:3306\) \
         -e GRAPH_CLUSTER="\"g01\": \"g01.falcon:6070\"" \
         -v /home/work/open-falcon/logs:/open-falcon/logs \
-        falcon-api
+        $REPO/falcon-api:$VERSION
 
         ### note: add multi-GRAPH:
         -e TRANSFER_CLUSTER="\"g01\": \"g01.falcon:6070\", \"g02\": \"g02.falcon:6070\"" \
@@ -151,7 +153,7 @@ docker run --name falcon-redis -p6379:6379 -d redis:4-alpine3.8
         -e PLUS_API=http:\\/\\/api.falcon:8080 \
         -e TRANSFER_PORT=transfer.falcon:6060 \
         -v /home/work/open-falcon/logs:/open-falcon/logs \
-        falcon-nodata
+        $REPO/falcon-nodata:$VERSION
 
     ## run falcon-aggregator container
     docker run -itd --name falcon-aggregator \
@@ -162,7 +164,7 @@ docker run --name falcon-redis -p6379:6379 -d redis:4-alpine3.8
         -e PLUS_API=http:\\/\\/api.falcon:8080 \
         -e PUSH_API=http:\\/\\/agent.falcon:1988\\/v1\\/push \
         -v /home/work/open-falcon/logs:/open-falcon/logs \
-        falcon-aggregator
+        $REPO/falcon-aggregator:$VERSION
 
 
     ## run falcon-dashboard container (see chapter 5)
@@ -185,7 +187,7 @@ docker run --name falcon-redis -p6379:6379 -d redis:4-alpine3.8
         -e MAIL_API=http:\\/\\/mail.falcon:4000\\/sender\\/mail \
         -e DASHBOARD=http:\\/\\/dashboard.falcon:8081 \
         -v /home/work/open-falcon/logs:/open-falcon/logs \
-        falcon-alarm
+        $REPO/falcon-alarm:$VERSION
 
         ### note: add other option below:
         -e IM_API=xxxxxx
@@ -200,7 +202,7 @@ docker run --name falcon-redis -p6379:6379 -d redis:4-alpine3.8
         -p 14444:14444 \
         -e TRANSFER_CLUSTER="\"t01\": \"t01.falcon:8433\"" \
         -v /home/work/open-falcon/logs:/open-falcon/logs \
-        falcon-gateway
+        $REPO/falcon-gateway:$VERSION
 
         ### note: add multi-transfers:
         -e TRANSFER_CLUSTER="\"t01\": \"t01.falcon:8433\", \"t02\": \"t02.falcon:8433\"" \
@@ -214,7 +216,7 @@ docker run --name falcon-redis -p6379:6379 -d redis:4-alpine3.8
         -e TRANSFER_RPC="\"t01.falcon:8433\"" \
         -e HBS_PORT=hbs.falcon:6030 \
         -v /home/work/open-falcon/logs:/open-falcon/logs \
-        falcon-agent
+        $REPO/falcon-agent:$VERSION
 
         note: can add option below:
         -e HOSTNAME=xxxx
@@ -254,6 +256,10 @@ docker run --name falcon-redis -p6379:6379 -d redis:4-alpine3.8
 
 ##### 6. Start falcon-mail in container
 ```
+    VERSION=v0.2.1.dt1.2.1
+    REPO=103.235.247.247/vbn/falcon-modules
+    docker pull $REPO/falcon-mail:$VERSION
+
     docker run -itd --name falcon-mail \
         -p 4000:4000 \
         -e SMTP_TYPE=smtp_ssl \
@@ -263,7 +269,7 @@ docker run --name falcon-redis -p6379:6379 -d redis:4-alpine3.8
         -e PASSWD=123456 \
         -e FROM=falcon@xxxx.com \
         -v /home/work/open-falcon/logs:/open-falcon/logs \
-        falcon-mail
+        $REPO/falcon-mail:$VERSION
 
     ## or you can just start/stop/restart mail:
     docker exec falcon-mail ./falconctl start/stop/restart xxx
