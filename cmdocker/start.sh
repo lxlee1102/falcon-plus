@@ -37,8 +37,8 @@ start_hbs() {
 
 start_judge() {
 	docker run -itd --name falcon-$1 \
-		--link=falcon-mysql:db.falcon \
 		--link=falcon-hbs:hbs.falcon \
+		--link=falcon-redis:redis.falcon \
 		-p 6080:6080 \
 		-p 6081:6081 \
 		-e HBS_PORT=hbs.falcon:6030 \
@@ -149,12 +149,29 @@ start_dashboard() {
 	docker ps -f name=$1
 }
 
-#		--link=falcon-mail:mail.falcon \
+start_mail() {
+	docker run -itd --name falcon-mail \
+		-p 4000:4000 \
+		-e SMTP_TYPE=smtp_ssl \
+		-e SMTP_SERVER=smtp.exmail.qq.com \
+		-e SMTP_PORT=465 \
+		-e USERNAME=test@cloudminds.com \
+		-e PASSWD=test123 \
+		-e FROM=noc@cloudminds.com \
+		-v /home/work/open-falcon/logs:/open-falcon/logs \
+		falcon-mail
+
+	docker exec falcon-$1 ./falconctl start
+	docker ps -f name=$1
+}
+
+
 start_alarm() {
 	docker run -itd --name falcon-$1 \
 		--link=falcon-mysql:db.falcon \
 		--link=falcon-redis:redis.falcon \
 		--link=falcon-api:api.falcon \
+		--link=falcon-mail:mail.falcon \
 		--link=falcon-dashboard:dashboard.falcon \
 		-p 9912:9912 \
 		-e MYSQL_PORT=root:$DB_PWD@tcp\(db.falcon:3306\) \
@@ -244,6 +261,9 @@ case $module in
 	 "dashboard") start_dashboard $1
 	 ;;
 
+	 "mail") start_mail $1
+	 ;;
+
 	 "alarm") start_alarm $1
 	 ;;
 
@@ -262,6 +282,7 @@ case $module in
 		start_nodata nodata
 		start_aggregator aggregator
 		start_dashboard dashboard
+		start_mail mail
 		start_alarm alarm
 		start_gateway gateway
 		start_agent agent
