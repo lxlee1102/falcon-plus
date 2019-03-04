@@ -16,7 +16,7 @@ RUN make all \
     && tar -zxf open-falcon-v*.tar.gz -C ${FALCON_DIR} \
     && rm -rf ${PROJ_PATH}
 
-EXPOSE 8433 8080
+EXPOSE 6030 8433 8080
 WORKDIR ${FALCON_DIR}
 
 # Start
