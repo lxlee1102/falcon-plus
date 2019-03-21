@@ -1,5 +1,5 @@
 FROM openfalcon/makegcc-golang:1.10-alpine
-LABEL maintainer laiwei.ustc@gmail.com
+LABEL maintainer shon.li@cloudminds.com
 USER root
 
 ENV FALCON_DIR=/open-falcon PROJ_PATH=${GOPATH}/src/github.com/open-falcon/falcon-plus
@@ -20,4 +20,5 @@ EXPOSE 6030 8433 8080
 WORKDIR ${FALCON_DIR}
 
 # Start
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+#CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+CMD ["/bin/sh", "-c", "./run.sh"]

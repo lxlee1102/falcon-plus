@@ -1,0 +1,106 @@
+version: '3'
+
+#
+# how to use myself:
+# 
+#    docker-compose up -d
+#    wget --no-check-certificate --http-user=vbn --http-passwd=cmvbn@2016 https://release.slink.datadn.net/download/openfalcon/falcon-docker-db-init.sh && sh falcon-docker-db-init.sh Pwd123456 && rm -f falcon-docker-db-init.sh
+#    docker-compose  restart
+
+
+services:
+  falcon-mysql:
+    container_name: falcon-mysql
+    image: mysql:5.7
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8 --collation-server=utf8_unicode_ci
+    restart: always
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - /home/work/mysql-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: Pwd123456
+      TZ: Asia/Shanghai
+    expose:
+      - "3306"
+
+  falcon-redis:
+    container_name: falcon-redis
+    image: redis:4-alpine3.8
+    restart: always
+    environment:
+      TZ: Asia/Shanghai
+    volumes:
+      - /etc/localtime:/etc/localtime
+    expose:
+      - "6379"
+
+  falcon-mail:
+    container_name: falcon-mail
+    image: harbor.cloudminds.com/vbn/falcon-modules/falcon-mail:v0.2.1.dt1.2.1
+    restart: always
+    environment:
+      SMTP_TYPE: smtp_ssl
+      SMTP_SERVER: smtp.exmail.qq.com
+      SMTP_PORT: 465
+      USERNAME: noc@cloudminds.com
+      PASSWD: Noc.vbn@123
+      FROM: noc@cloudminds.com
+    volumes:
+      - /home/work/open-falcon/logs:/open-falcon/logs
+      - /etc/localtime:/etc/localtime
+
+  falcon-plus:
+    container_name: falcon-plus
+    image: harbor.cloudminds.com/vbn/falcon-plus:v0.2.1.dt1.2.2
+    restart: always
+    depends_on:
+      - falcon-mysql
+      - falcon-redis
+      - falcon-mail
+    links:
+      - falcon-mysql:db.falcon 
+      - falcon-redis:redis.falcon 
+      - falcon-mail:mail.falcon
+    environment:
+      MYSQL_PORT: root:Pwd123456@tcp\(db.falcon:3306\)
+      REDIS_PORT: redis.falcon:6379
+      MAIL_API: http:\\/\\/mail.falcon:4000\\/sender\\/mail
+      PUSH_API: http:\\/\\/172.17.0.1:1988\\/v1\\/push
+      DASHBOARD_API: http:\\/\\/172.17.0.1:8081
+    volumes:
+      - /home/work/open-falcon/data:/open-falcon/graph/data
+      - /home/work/open-falcon/logs:/open-falcon/logs
+      - /etc/localtime:/etc/localtime
+    ports:
+      - "8433:8433"
+      - "8080:8080"
+      - "6030:6030"
+
+  falcon-dashboard:
+    container_name: falcon-dashboard
+    image: openfalcon/falcon-dashboard:v0.2.1
+    restart: always
+    depends_on:
+      - falcon-mysql
+      - falcon-plus
+    links:
+      - falcon-mysql:db.falcon
+      - falcon-plus:api.falcon
+    environment:
+      API_ADDR: http://api.falcon:8080/api/v1 
+      PORTAL_DB_HOST: db.falcon
+      PORTAL_DB_PORT: 3306
+      PORTAL_DB_USER: root
+      PORTAL_DB_PASS: Pwd123456
+      PORTAL_DB_NAME: falcon_portal
+      ALARM_DB_HOST: db.falcon
+      ALARM_DB_PORT: 3306
+      ALARM_DB_USER: root
+      ALARM_DB_PASS: Pwd123456
+      ALARM_DB_NAME: alarms
+    volumes:
+      - /etc/localtime:/etc/localtime
+    working_dir: /open-falcon/dashboard
+    entrypoint: ./control startfg
+    ports:
+      - "8081:8081"

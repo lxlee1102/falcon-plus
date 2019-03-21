@@ -1,0 +1,124 @@
+#### 105 EVN install falcon-docker recode
+#### 20190320 14:00
+#### shon.li
+
+ ## start mysql in container
+    docker run -itd \
+        --name falcon-mysql \
+        -v /home/work/mysql-data:/var/lib/mysql \
+        -e MYSQL_ROOT_PASSWORD=Cloud1688* \
+        -p 3306:3306 \
+        mysql:5.7
+
+wget --no-check-certificate --http-user=vbn --http-passwd=cmvbn@2016 https://release.slink.datadn.net/download/openfalcon/falcon-docker-db-init.sh && sh falcon-docker-db-init.sh Cloud1688* && rm -f falcon-docker-db-init.sh
+
+##  Start redis in container
+# docker run --name falcon-redis -p6379:6379 -d redis:4-alpine3.8
+ docker run --name falcon-redis -d redis:4-alpine3.8
+
+## Start falcon-mail in container
+    #VERSION=v0.2.1.dt1.2.1
+    #REPO=103.235.247.247/vbn/falcon-modules
+    #docker pull $REPO/falcon-mail:$VERSION
+    docker pull harbor.cloudminds.com/vbn/falcon-modules/falcon-mail:v0.2.1.dt1.2.1
+
+    docker run -itd --name falcon-mail \
+        -p 4000:4000 \
+        -e SMTP_TYPE=smtp_ssl \
+        -e SMTP_SERVER=smtp.exmail.qq.com \
+        -e SMTP_PORT=465 \
+        -e USERNAME=noc@cloudminds.com \
+        -e PASSWD=Noc.vbn@123 \
+        -e FROM=noc@cloudminds.com \
+        -v /home/work/open-falcon/logs:/open-falcon/logs \
+        -v /etc/localtime:/etc/localtime \
+	harbor.cloudminds.com/vbn/falcon-modules/falcon-mail:v0.2.1.dt1.2.1
+   ## or you can just start/stop/restart mail:
+    docker exec falcon-mail ./falconctl start/stop/restart
+
+
+## pull images from hub.docker.com/openfalcon
+    docker pull harbor.cloudminds.com/vbn/falcon-plus:v0.2.1.dt1.2
+    
+    ## run falcon-plus container
+    docker run -itd --name falcon-plus \
+         --link=falcon-mysql:db.falcon \
+         --link=falcon-redis:redis.falcon \
+         --link=falcon-mail:mail.falcon \
+         -p 8433:8433 \
+         -p 8080:8080 \
+	 -p 6030:6030 \
+         -e MYSQL_PORT=root:Cloud1688*@tcp\(db.falcon:3306\) \
+         -e REDIS_PORT=redis.falcon:6379  \
+	 -e MAIL_API=http:\\/\\/mail.falcon:4000\\/sender\\/mail \
+	 -e PUSH_API=http:\\/\\/172.17.0.1:1988\\/v1\\/push \
+	 -e DASHBOARD_API=http:\\/\\/172.17.0.1:8081 \
+         -v /home/work/open-falcon/data:/open-falcon/graph/data \
+         -v /home/work/open-falcon/logs:/open-falcon/logs \
+         -v /etc/localtime:/etc/localtime \
+         harbor.cloudminds.com/vbn/falcon-plus:v0.2.1.dt1.2.1
+
+    docker exec falcon-plus sh ctrl.sh start \
+            graph hbs judge transfer nodata aggregator api alarm
+#    docker exec falcon-plus sh ctrl.sh restart \
+#            graph hbs judge transfer nodata aggregator api alarm
+
+##Start falcon-dashboard in container
+
+ docker run -itd --name falcon-dashboard \
+        -p 8081:8081 \
+        --link=falcon-mysql:db.falcon \
+        --link=falcon-plus:api.falcon \
+        -e API_ADDR=http://api.falcon:8080/api/v1 \
+        -e PORTAL_DB_HOST=db.falcon \
+        -e PORTAL_DB_PORT=3306 \
+        -e PORTAL_DB_USER=root \
+        -e PORTAL_DB_PASS=Cloud1688* \
+        -e PORTAL_DB_NAME=falcon_portal \
+        -e ALARM_DB_HOST=db.falcon \
+        -e ALARM_DB_PORT=3306 \
+        -e ALARM_DB_USER=root \
+        -e ALARM_DB_PASS=Cloud1688*\
+        -e ALARM_DB_NAME=alarms \
+	-v /etc/localtime:/etc/localtime \
+        -w /open-falcon/dashboard openfalcon/falcon-dashboard:v0.2.1  \
+       './control startfg'
+
+
+#### modify config
+# falcon-plus:v0.2.1.dt1.2.1 don't need to do below:
+#
+#docker exec -ti falcon-plus vi alarm/config/cfg.json
+#   "mail": "http://172.17.0.1:4000/sender/mail",
+#   "dashboard": "http://172.17.0.1:8081",
+#
+#  
+#docker exec -ti falcon-plus vi aggregator/config/cfg.json
+#   "push_api": "http://172.17.0.1:1988/v1/push"
+
+
+## close debug log,for each modules in container falcon-plus .
+docker exec -ti falcon-plus vi ./*/config/cfg.json 
+
+## docker containers auto start when boot.
+#
+#
+## install agent to GW, authdns,fakehari,
+login target host :
+ BV-SH06-02-06 , BV-SH06-02-05 , BV-HK02-02-07 , BGP-BJBJ-02-022
+wget --no-check-certificate --http-user=vbn --http-passwd=cmvbn@2016 https://release.slink.datadn.net/download/openfalcon/falcon.sh && sh falcon.sh agent && rm -f falcon.sh
+wget --no-check-certificate --http-user=vbn --http-passwd=cmvbn@2016 https://release.slink.datadn.net/download/openfalcon/setcfg/105env-agentcfg.sh && sh 105env-agentcfg.sh && rm -rf 105env-agentcfg.sh
+cd /home/work/ && wget --no-check-certificate --http-user=vbn --http-passwd=cmvbn@2016 https://release.slink.datadn.net/download/openfalcon/falcon-monitor.sh && sh falcon-monitor.sh install
+
+## update release-server 105ENV.git and update scritps, on every host:
+# BV-SH06-02-06 , BV-SH06-02-05 , BV-HK02-02-07 , BGP-BJBJ-02-022
+curl http://127.0.0.1:1988/plugin/update
+
+
+## install mcsgw-agent-go  to gw
+ BV-SH06-02-06 , BV-SH06-02-05 , BV-HK02-02-07 ,
+wget --no-check-certificate --http-user=vbn --http-passwd=cmvbn@2016 https://release.slink.datadn.net/download/mgc/mcsgw-agent.sh && sh mcsgw-agent.sh && rm -rf mcsgw-agent.sh
+
+## dashboard config template  callback :
+# https://105.gms.datadn.net/api/alarms/report  : x509 error
+http://10.21.100.6:1080/api/alarms/report
