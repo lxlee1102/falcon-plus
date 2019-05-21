@@ -102,8 +102,8 @@ docker run --name falcon-redis -p6379:6379 -d redis:4-alpine3.8
 
     ## run falcon-judge container
     docker run -itd --name falcon-judge \
-        --link=falcon-mysql:db.falcon \
         --link=falcon-hbs:hbs.falcon \
+        --link=falcon-redis:redis.falcon \
         -p 6080:6080 \
         -p 6081:6081 \
         -e HBS_PORT=hbs.falcon:6030 \
@@ -133,6 +133,7 @@ docker run --name falcon-redis -p6379:6379 -d redis:4-alpine3.8
     ## run falcon-api container
     docker run -itd --name falcon-api \
         --link=falcon-mysql:db.falcon \
+        --link=falcon-graph:g01.falcon \
         -p 8080:8080 \
         -e MYSQL_PORT=root:test123456@tcp\(db.falcon:3306\) \
         -e GRAPH_CLUSTER="\"g01\": \"g01.falcon:6070\"" \
