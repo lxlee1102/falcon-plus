@@ -17,4 +17,5 @@ RUN mv supervisord.conf.graph /etc/supervisord.conf && \
 EXPOSE 6071 6070
 
 # Start
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+# CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+CMD ["/bin/sh", "-c", "./falconctl run"]

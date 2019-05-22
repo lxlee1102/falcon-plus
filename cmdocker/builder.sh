@@ -39,7 +39,7 @@ build_agent() {
 	check_out
 
 	tar -zxf ../open-falcon-v*.tar.gz -C ./out ./$PROG ./public ./plugin  && rm -f ./out/$PROG/config/cfg.json
-	cp ./config/$PROG.tpl ./out/$PROG/config/
+	cp ./config/$PROG.tpl ./out/$PROG/
 	cp ./falconctl ../open-falcon ./Dockerfile.$PROG ./supervisord.conf.$PROG ./zoneinfo.zip ./out/
 	if [ $? != 0 ]; then
 		exit 1;
@@ -57,7 +57,7 @@ build_module() {
 	check_out
 
 	tar -zxf ../open-falcon-v*.tar.gz -C ./out ./$PROG  && rm -f ./out/$PROG/config/cfg.json
-	cp ./config/$PROG.tpl ./out/$PROG/config/
+	cp ./config/$PROG.tpl ./out/$PROG/
 	cp ./falconctl ../open-falcon ./Dockerfile.$PROG ./supervisord.conf.$PROG ./zoneinfo.zip ./out/
 	if [ $? != 0 ]; then
 		exit 1;
@@ -142,6 +142,7 @@ commands:
 
 var=$1
 module=${var%:*}
+version=${var##*:}
 
 case $module in
 	"graph") build_module graph $1
@@ -178,16 +179,22 @@ case $module in
 	;;
 
 	"all")
-		build_module graph graph
-		build_module hbs hbs
-		build_module judge judge
-		build_module transfer transfer
-		build_module api api
-		build_module nodata nodata
-		build_module aggregator aggregator
-		build_module alarm alarm
-		build_module gateway gateway
-		build_agent agent agent
+		if [ "$version" = "$module" ] ; then
+			version=
+		else
+			version=":$version"
+		fi
+
+		build_module graph graph$version
+		build_module hbs hbs$version
+		build_module judge judge$version
+		build_module transfer transfer$version
+		build_module api api$version
+		build_module nodata nodata$version
+		build_module aggregator aggregator$version
+		build_module alarm alarm$version
+		build_module gateway gateway$version
+		build_agent agent agent$version
 	;;
 
 	*)

@@ -1,0 +1,340 @@
+version: '3'
+
+#
+# how to use myself:
+# 
+#    docker-compose up -d
+#    wget --no-check-certificate --http-user=vbn --http-passwd=cmvbn@2016 https://release.slink.datadn.net/download/openfalcon/falcon-docker-db-init.sh && sh falcon-docker-db-init.sh Pwd123456 && rm -f falcon-docker-db-init.sh
+#    docker-compose  restart
+
+
+services:
+  falcon-mysql:
+    container_name: falcon-mysql
+    image: mysql:5.7
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8 --collation-server=utf8_unicode_ci
+    restart: always
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - ${PWD}/open-falcon/mysql-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: Pwd123456
+      TZ: Asia/Shanghai
+    expose:
+      - "3306"
+
+  falcon-redis:
+    container_name: falcon-redis
+    image: redis:4-alpine3.8
+    restart: always
+    environment:
+      TZ: Asia/Shanghai
+    volumes:
+      - /etc/localtime:/etc/localtime
+    expose:
+      - "6379"
+
+  falcon-mail:
+    container_name: falcon-mail
+    image: harbor.cloudminds.com/vbn/falcon-modules/falcon-mail:dt1.2.3
+    restart: always
+    environment:
+      SMTP_TYPE: smtp_ssl
+      SMTP_SERVER: smtp.exmail.qq.com
+      SMTP_PORT: 465
+      USERNAME: noc@cloudminds.com
+      PASSWD: Noc.vbn@123
+      FROM: noc@cloudminds.com
+    volumes:
+      - ${PWD}/open-falcon/mail/logs:/open-falcon/logs
+      - ${PWD}/open-falcon/mail/config:/open-falcon/mail/config
+      - /etc/localtime:/etc/localtime
+    expose:
+      - "4000"
+
+#  falcon-plus:
+#    container_name: falcon-plus
+#    image: harbor.cloudminds.com/vbn/falcon-plus:v0.2.1.dt1.2.2
+#    restart: always
+#    depends_on:
+#      - falcon-mysql
+#      - falcon-redis
+#      - falcon-mail
+#    links:
+#      - falcon-mysql:db.falcon 
+#      - falcon-redis:redis.falcon 
+#      - falcon-mail:mail.falcon
+#    environment:
+#      MYSQL_PORT: root:Pwd123456@tcp\(db.falcon:3306\)
+#      REDIS_PORT: redis.falcon:6379
+#      MAIL_API: http:\\/\\/mail.falcon:4000\\/sender\\/mail
+#      PUSH_API: http:\\/\\/172.17.0.1:1988\\/v1\\/push
+#      DASHBOARD_API: http:\\/\\/172.17.0.1:8081
+#    volumes:
+#      - /home/work/open-falcon/data:/open-falcon/graph/data
+#      - /home/work/open-falcon/logs:/open-falcon/logs
+#      - /etc/localtime:/etc/localtime
+#    ports:
+#      - "8433:8433"
+#      - "8080:8080"
+#      - "6030:6030"
+#
+
+  falcon-graph:
+    container_name: falcon-graph
+    image: harbor.cloudminds.com/vbn/falcon-modules/falcon-graph:dt1.2.3
+    restart: always
+    depends_on:
+      - falcon-mysql
+    links:
+      - falcon-mysql:db.falcon
+    environment:
+      MYSQL_PORT: root:Pwd123456@tcp\(db.falcon:3306\)
+      GRAPH_CLUSTER: "\"g0\": \"127.0.0.1:6070\""
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - ${PWD}/open-falcon/graph/data:/open-falcon/graph/data
+      - ${PWD}/open-falcon/graph/config:/open-falcon/graph/config
+      - ${PWD}/open-falcon/graph/logs:/open-falcon/logs
+    expose:
+      - "6070"
+      - "6071"
+
+
+  falcon-hbs:
+    container_name: falcon-hbs
+    image: harbor.cloudminds.com/vbn/falcon-modules/falcon-hbs:dt1.2.3
+    restart: always
+    depends_on:
+      - falcon-mysql
+    links:
+      - falcon-mysql:db.falcon
+    environment:
+      MYSQL_PORT: root:Pwd123456@tcp\(db.falcon:3306\)
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - ${PWD}/open-falcon/hbs/config:/open-falcon/hbs/config
+      - ${PWD}/open-falcon/hbs/logs:/open-falcon/logs
+    ports:
+      - "6030:6030"
+    expose:
+      - "6031"
+
+  
+  falcon-judge:
+    container_name: falcon-judge
+    image: harbor.cloudminds.com/vbn/falcon-modules/falcon-judge:dt1.2.3
+    restart: always
+    depends_on:
+      - falcon-redis
+      - falcon-hbs
+    links:
+      - falcon-redis:redis.falcon
+      - falcon-hbs:hbs.falcon
+    environment:
+      HBS_PORT: hbs.falcon:6030
+      REDIS_PORT: redis.falcon:6379
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - ${PWD}/open-falcon/judge/config:/open-falcon/judge/config
+      - ${PWD}/open-falcon/judge/logs:/open-falcon/logs
+    expose:
+      - "6080"
+      - "6081"
+
+
+  falcon-transfer:
+    container_name: falcon-transfer
+    image: harbor.cloudminds.com/vbn/falcon-modules/falcon-transfer:dt1.2.3
+    restart: always
+    depends_on:
+      - falcon-mysql
+      - falcon-graph
+      - falcon-judge
+    links:
+      - falcon-mysql:db.falcon
+      - falcon-graph:g01.falcon
+      - falcon-judge:j01.falcon
+    environment:
+      MYSQL_PORT: root:Pwd123456@tcp\(db.falcon:3306\)
+      GRAPH_CLUSTER: "\"g01\": \"g01.falcon:6070\""
+      JUDGE_CLUSTER: "\"j01\": \"j01.falcon:6080\""
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - ${PWD}/open-falcon/transfer/config:/open-falcon/transfer/config
+      - ${PWD}/open-falcon/transfer/logs:/open-falcon/logs
+    ports:
+      - "8433:8433"
+    expose:
+      - "6060"
+  
+
+  falcon-api:
+    container_name: falcon-api
+    image: harbor.cloudminds.com/vbn/falcon-modules/falcon-api:dt1.2.3
+    restart: always
+    depends_on:
+      - falcon-mysql
+      - falcon-graph
+    links:
+      - falcon-mysql:db.falcon
+      - falcon-graph:g01.falcon
+    environment:
+      MYSQL_PORT: root:Pwd123456@tcp\(db.falcon:3306\)
+      GRAPH_CLUSTER: "\"g01\": \"g01.falcon:6070\""
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - ${PWD}/open-falcon/api/config:/open-falcon/api/config
+      - ${PWD}/open-falcon/api/logs:/open-falcon/logs
+    ports:
+      - "8080:8080"
+
+
+  falcon-nodata:
+    container_name: falcon-nodata
+    image: harbor.cloudminds.com/vbn/falcon-modules/falcon-nodata:dt1.2.3
+    restart: always
+    depends_on:
+      - falcon-mysql
+      - falcon-transfer
+      - falcon-api
+    links:
+      - falcon-mysql:db.falcon
+      - falcon-transfer:transfer.falcon
+      - falcon-api:api.falcon
+    environment:
+      MYSQL_PORT: root:Pwd123456@tcp\(db.falcon:3306\)
+      PLUS_API: http:\\/\\/api.falcon:8080
+      TRANSFER_PORT: transfer.falcon:6060
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - ${PWD}/open-falcon/nodata/config:/open-falcon/nodata/config
+      - ${PWD}/open-falcon/nodata/logs:/open-falcon/logs
+    expose:
+      - "6090"
+
+
+  falcon-agent:
+    container_name: falcon-agent
+    image: harbor.cloudminds.com/vbn/falcon-modules/falcon-agent:dt1.2.3
+    restart: always
+    depends_on:
+      - falcon-transfer
+      - falcon-hbs
+    links:
+      - falcon-transfer:t01.falcon
+      - falcon-hbs:hbs.falcon
+    environment:
+      HBS_PORT: hbs.falcon:6030
+      TRANSFER_RPC: "\"t01.falcon:8433\""
+      #     TRANSFER_RPC: "\"t01.falcon:8433\", \"t02.falcon:8433\""
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - ${PWD}/open-falcon/agent/config:/open-falcon/agent/config
+      - ${PWD}/open-falcon/agent/logs:/open-falcon/logs
+    expose:
+      - "1988"
+
+  falcon-aggregator:
+    container_name: falcon-aggregator
+    image: harbor.cloudminds.com/vbn/falcon-modules/falcon-aggregator:dt1.2.3
+    restart: always
+    depends_on:
+      - falcon-mysql
+      - falcon-api
+      - falcon-agent
+    links:
+      - falcon-mysql:db.falcon
+      - falcon-api:api.falcon
+      - falcon-agent:agent.falcon
+    environment:
+      MYSQL_PORT: root:Pwd123456@tcp\(db.falcon:3306\)
+      PLUS_API: http:\\/\\/api.falcon:8080
+      PUSH_API: http:\\/\\/agent.falcon:1988\\/v1\\/push
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - ${PWD}/open-falcon/aggregator/config:/open-falcon/aggregator/config
+      - ${PWD}/open-falcon/aggregator/logs:/open-falcon/logs
+    expose:
+      - "6055"
+
+  falcon-dashboard:
+    container_name: falcon-dashboard
+    image: openfalcon/falcon-dashboard:v0.2.1
+    restart: always
+    depends_on:
+      - falcon-mysql
+      - falcon-api
+    links:
+      - falcon-mysql:db.falcon
+      - falcon-api:api.falcon
+    environment:
+      API_ADDR: http://api.falcon:8080/api/v1 
+      PORTAL_DB_HOST: db.falcon
+      PORTAL_DB_PORT: 3306
+      PORTAL_DB_USER: root
+      PORTAL_DB_PASS: Pwd123456
+      PORTAL_DB_NAME: falcon_portal
+      ALARM_DB_HOST: db.falcon
+      ALARM_DB_PORT: 3306
+      ALARM_DB_USER: root
+      ALARM_DB_PASS: Pwd123456
+      ALARM_DB_NAME: alarms
+    volumes:
+      - /etc/localtime:/etc/localtime
+    working_dir: /open-falcon/dashboard
+    entrypoint: ./control startfg
+    ports:
+      - "8081:8081"
+
+
+  falcon-alarm:
+    container_name: falcon-alarm
+    image: harbor.cloudminds.com/vbn/falcon-modules/falcon-alarm:dt1.2.3
+    restart: always
+    depends_on:
+      - falcon-mysql
+      - falcon-redis
+      - falcon-api
+      - falcon-mail
+      - falcon-dashboard
+    links:
+      - falcon-mysql:db.falcon
+      - falcon-redis:redis.falcon
+      - falcon-api:api.falcon
+      - falcon-mail:mail.falcon
+      - falcon-dashboard:dashboard.falcon
+    environment:
+      MYSQL_PORT: root:Pwd123456@tcp\(db.falcon:3306\)
+      REDIS_PORT: redis.falcon:6379
+      PLUS_API: http:\\/\\/api.falcon:8080
+      MAIL_API: http:\\/\\/mail.falcon:4000\\/sender\\/mail
+      DASHBOARD: http:\\/\\/dashboard.falcon:8081
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - ${PWD}/open-falcon/alarm/config:/open-falcon/alarm/config
+      - ${PWD}/open-falcon/alarm/logs:/open-falcon/logs
+    expose:
+      - "9912"
+
+
+#  falcon-gateway:
+#    container_name: falcon-gateway
+#    image: harbor.cloudminds.com/vbn/falcon-modules/falcon-gateway:dt1.2.3
+#    restart: always
+#    depends_on:
+#      - falcon-transfer
+#    links:
+#      - falcon-transfer:t01.falcon
+#    environment:
+#      TRANSFER_CLUSTER: "\"t01\": \"t01.falcon:8433\""
+#    volumes:
+#      - /etc/localtime:/etc/localtime
+#      - ${PWD}/open-falcon/gateway/config:/open-falcon/gateway/config
+#      - ${PWD}/open-falcon/gateway/logs:/open-falcon/logs
+#    ports:
+#      - "16060:16060"
+#      - "18433:18433"
+#      - "14444:14444"
+
+

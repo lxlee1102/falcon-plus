@@ -39,34 +39,34 @@ fi
 
 reset_graph_cfg() {
 	PROG=graph
-	cp -f $DOCKER_DIR/$PROG/config/$PROG.tpl  $DOCKER_DIR/$PROG/config/cfg.json
+	cp -f $DOCKER_DIR/$PROG/$PROG.tpl  $DOCKER_DIR/$PROG/config/cfg.json
 	find $DOCKER_DIR/$PROG/config/*.json -type f -exec sed -i "s/%%GRAPH_CLUSTER%%/$GRAPH_CLUSTER/g" {} \;
 	find $DOCKER_DIR/$PROG/config/*.json -type f -exec sed -i "s/%%MYSQL%%/$MYSQL_PORT/g" {} \;
 }
 
 reset_hbs_cfg() {
 	PROG=hbs
-	cp -f $DOCKER_DIR/$PROG/config/$PROG.tpl  $DOCKER_DIR/$PROG/config/cfg.json
+	cp -f $DOCKER_DIR/$PROG/$PROG.tpl  $DOCKER_DIR/$PROG/config/cfg.json
 	find $DOCKER_DIR/$PROG/config/*.json -type f -exec sed -i "s/%%MYSQL%%/$MYSQL_PORT/g" {} \;
 }
 
 reset_judge_cfg() {
 	PROG=judge
-	cp -f $DOCKER_DIR/$PROG/config/$PROG.tpl  $DOCKER_DIR/$PROG/config/cfg.json
+	cp -f $DOCKER_DIR/$PROG/$PROG.tpl  $DOCKER_DIR/$PROG/config/cfg.json
 	find $DOCKER_DIR/$PROG/config/*.json -type f -exec sed -i "s/%%HBS%%/$HBS_PORT/g" {} \;
 	find $DOCKER_DIR/*/config/*.json -type f -exec sed -i "s/%%REDIS%%/$REDIS_PORT/g" {} \;
 }
 
 reset_transfer_cfg() {
 	PROG=transfer
-	cp -f $DOCKER_DIR/$PROG/config/$PROG.tpl  $DOCKER_DIR/$PROG/config/cfg.json
+	cp -f $DOCKER_DIR/$PROG/$PROG.tpl  $DOCKER_DIR/$PROG/config/cfg.json
 	find $DOCKER_DIR/$PROG/config/*.json -type f -exec sed -i "s/%%GRAPH_CLUSTER%%/$GRAPH_CLUSTER/g" {} \;
 	find $DOCKER_DIR/$PROG/config/*.json -type f -exec sed -i "s/%%JUDGE_CLUSTER%%/$JUDGE_CLUSTER/g" {} \;
 }
 
 reset_api_cfg() {
 	PROG=api
-	cp -f $DOCKER_DIR/$PROG/config/$PROG.tpl  $DOCKER_DIR/$PROG/config/cfg.json
+	cp -f $DOCKER_DIR/$PROG/$PROG.tpl  $DOCKER_DIR/$PROG/config/cfg.json
 	find $DOCKER_DIR/$PROG/config/*.json -type f -exec sed -i "s/%%MYSQL%%/$MYSQL_PORT/g" {} \;
 	find $DOCKER_DIR/$PROG/config/*.json -type f -exec sed -i "s/%%GRAPH_CLUSTER%%/$GRAPH_CLUSTER/g" {} \;
 	#use absolute path of metric_list_file in docker
@@ -75,7 +75,7 @@ reset_api_cfg() {
 
 reset_nodata_cfg() {
 	PROG=nodata
-	cp -f $DOCKER_DIR/$PROG/config/$PROG.tpl  $DOCKER_DIR/$PROG/config/cfg.json
+	cp -f $DOCKER_DIR/$PROG/$PROG.tpl  $DOCKER_DIR/$PROG/config/cfg.json
 	find $DOCKER_DIR/$PROG/config/*.json -type f -exec sed -i "s/%%PLUS_API%%/$PLUS_API/g" {} \;
 	find $DOCKER_DIR/$PROG/config/*.json -type f -exec sed -i "s/%%MYSQL%%/$MYSQL_PORT/g" {} \;
 	find $DOCKER_DIR/$PROG/config/*.json -type f -exec sed -i "s/%%TRANSFER%%/$TRANSFER_PORT/g" {} \;
@@ -84,7 +84,7 @@ reset_nodata_cfg() {
 
 reset_aggregator_cfg() {
 	PROG=aggregator
-	cp -f $DOCKER_DIR/$PROG/config/$PROG.tpl  $DOCKER_DIR/$PROG/config/cfg.json
+	cp -f $DOCKER_DIR/$PROG/$PROG.tpl  $DOCKER_DIR/$PROG/config/cfg.json
 	find $DOCKER_DIR/$PROG/config/*.json -type f -exec sed -i "s/%%PLUS_API%%/$PLUS_API/g" {} \;
 	find $DOCKER_DIR/$PROG/config/*.json -type f -exec sed -i "s/%%PUSH_API%%/$PUSH_API/g" {} \;
 	find $DOCKER_DIR/$PROG/config/*.json -type f -exec sed -i "s/%%MYSQL%%/$MYSQL_PORT/g" {} \;
@@ -93,7 +93,7 @@ reset_aggregator_cfg() {
 
 reset_alarm_cfg() {
 	PROG=alarm
-	cp -f $DOCKER_DIR/$PROG/config/$PROG.tpl  $DOCKER_DIR/$PROG/config/cfg.json
+	cp -f $DOCKER_DIR/$PROG/$PROG.tpl  $DOCKER_DIR/$PROG/config/cfg.json
 	find $DOCKER_DIR/$PROG/config/*.json -type f -exec sed -i "s/%%REDIS%%/$REDIS_PORT/g" {} \;
 	find $DOCKER_DIR/$PROG/config/*.json -type f -exec sed -i "s/%%IM_API%%/$IM_API/g" {} \;
 	find $DOCKER_DIR/$PROG/config/*.json -type f -exec sed -i "s/%%SMS_API%%/$SMS_API/g" {} \;
@@ -105,13 +105,13 @@ reset_alarm_cfg() {
 
 reset_gateway_cfg() {
 	PROG=gateway
-	cp -f $DOCKER_DIR/$PROG/config/$PROG.tpl  $DOCKER_DIR/$PROG/config/cfg.json
+	cp -f $DOCKER_DIR/$PROG/$PROG.tpl  $DOCKER_DIR/$PROG/config/cfg.json
 	find $DOCKER_DIR/$PROG/config/*.json -type f -exec sed -i "s/%%TRANSFER_CLUSTER%%/$TRANSFER_CLUSTER/g" {} \;
 }
 
 reset_agent_cfg() {
 	PROG=agent
-	cp -f $DOCKER_DIR/$PROG/config/$PROG.tpl  $DOCKER_DIR/$PROG/config/cfg.json
+	cp -f $DOCKER_DIR/$PROG/$PROG.tpl  $DOCKER_DIR/$PROG/config/cfg.json
 	find $DOCKER_DIR/$PROG/config/*.json -type f -exec sed -i "s/%%HOSTNAME%%/$HOSTNAME/g" {} \;
 	find $DOCKER_DIR/$PROG/config/*.json -type f -exec sed -i "s/%%HBS%%/$HBS_PORT/g" {} \;
 	find $DOCKER_DIR/$PROG/config/*.json -type f -exec sed -i "s/%%TRANSFER_RPC%%/$TRANSFER_RPC/g" {} \;
@@ -172,8 +172,12 @@ if [ "$1" == "check" ]; then
 	exit 0
 fi
 
-# init config in first time running
-if [ "$1" == "start" ]; then
+#
+# comand: run
+#    used in start a docker container, will call supervisord
+# to start/stop falcon-$modules
+#
+if [ "$1" == "run" ]; then
 	for m in $FALCON_MODULES
 	do
 		if [ ! -f $DOCKER_DIR/$m/config/cfg.json ]; then
@@ -181,8 +185,15 @@ if [ "$1" == "start" ]; then
 			break;
 		fi
 	done
+
+
+	/usr/bin/supervisord -c /etc/supervisord.conf
+	exit 0
 fi
 
+#
+# other commands, is belong to supervisorctl
+#
 if [ $# == 1 ]; then
 	supervisorctl $* $FALCON_MODULES
 else
