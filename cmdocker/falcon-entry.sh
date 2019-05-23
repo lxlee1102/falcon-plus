@@ -159,36 +159,13 @@ reset_configs() {
 	done
 }
 
+# init-config
+for m in $FALCON_MODULES
+do
+	if [ ! -f $DOCKER_DIR/$m/config/cfg.json ]; then
+		reset_configs
+		break;
+	fi
+done
 
-
-
-if [ "$1" == "reset" ]; then
-	reset_configs
-	exit 0
-fi
-
-if [ "$1" == "check" ]; then
-	$DOCKER_DIR/open-falcon check $FALCON_MODULES
-	exit 0
-fi
-
-#
-if [ "$1" == "start" ]; then
-	for m in $FALCON_MODULES
-	do
-		if [ ! -f $DOCKER_DIR/$m/config/cfg.json ]; then
-			reset_configs
-			break;
-		fi
-	done
-fi
-
-#
-# other commands, is belong to supervisorctl
-#
-if [ $# == 1 ]; then
-	supervisorctl $* $FALCON_MODULES
-else
-	supervisorctl $*
-fi
-
+exec "$@"

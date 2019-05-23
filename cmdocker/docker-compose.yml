@@ -3,7 +3,7 @@ version: '3'
 #
 # how to use myself:
 # 
-#    docker-compose up -d
+#    docker-compose IMAGE_URL=harbor.cloudminds.com/vbn/falcon-modules/ up -d
 #    wget --no-check-certificate --http-user=vbn --http-passwd=cmvbn@2016 https://release.slink.datadn.net/download/openfalcon/falcon-docker-db-init.sh && sh falcon-docker-db-init.sh Pwd123456 && rm -f falcon-docker-db-init.sh
 #    docker-compose  restart
 
@@ -36,7 +36,7 @@ services:
 
   falcon-mail:
     container_name: falcon-mail
-    image: harbor.cloudminds.com/vbn/falcon-modules/falcon-mail:dt1.2.3
+    image: ${IMAGE_URL}falcon-mail:dt1.2.4
     restart: always
     environment:
       SMTP_TYPE: smtp_ssl
@@ -54,7 +54,7 @@ services:
 
 #  falcon-plus:
 #    container_name: falcon-plus
-#    image: harbor.cloudminds.com/vbn/falcon-plus:v0.2.1.dt1.2.2
+#    image: ${IMAGE_URL}falcon-plus:v0.2.1.dt1.2.2
 #    restart: always
 #    depends_on:
 #      - falcon-mysql
@@ -82,7 +82,7 @@ services:
 
   falcon-graph:
     container_name: falcon-graph
-    image: harbor.cloudminds.com/vbn/falcon-modules/falcon-graph:dt1.2.3
+    image: ${IMAGE_URL}falcon-graph:dt1.2.4
     restart: always
     depends_on:
       - falcon-mysql
@@ -103,7 +103,7 @@ services:
 
   falcon-hbs:
     container_name: falcon-hbs
-    image: harbor.cloudminds.com/vbn/falcon-modules/falcon-hbs:dt1.2.3
+    image: ${IMAGE_URL}falcon-hbs:dt1.2.4
     restart: always
     depends_on:
       - falcon-mysql
@@ -123,7 +123,7 @@ services:
   
   falcon-judge:
     container_name: falcon-judge
-    image: harbor.cloudminds.com/vbn/falcon-modules/falcon-judge:dt1.2.3
+    image: ${IMAGE_URL}falcon-judge:dt1.2.4
     restart: always
     depends_on:
       - falcon-redis
@@ -145,7 +145,7 @@ services:
 
   falcon-transfer:
     container_name: falcon-transfer
-    image: harbor.cloudminds.com/vbn/falcon-modules/falcon-transfer:dt1.2.3
+    image: ${IMAGE_URL}falcon-transfer:dt1.2.4
     restart: always
     depends_on:
       - falcon-mysql
@@ -171,7 +171,7 @@ services:
 
   falcon-api:
     container_name: falcon-api
-    image: harbor.cloudminds.com/vbn/falcon-modules/falcon-api:dt1.2.3
+    image: ${IMAGE_URL}falcon-api:dt1.2.4
     restart: always
     depends_on:
       - falcon-mysql
@@ -192,7 +192,7 @@ services:
 
   falcon-nodata:
     container_name: falcon-nodata
-    image: harbor.cloudminds.com/vbn/falcon-modules/falcon-nodata:dt1.2.3
+    image: ${IMAGE_URL}falcon-nodata:dt1.2.4
     restart: always
     depends_on:
       - falcon-mysql
@@ -216,7 +216,7 @@ services:
 
   falcon-agent:
     container_name: falcon-agent
-    image: harbor.cloudminds.com/vbn/falcon-modules/falcon-agent:dt1.2.3
+    image: ${IMAGE_URL}falcon-agent:dt1.2.4
     restart: always
     depends_on:
       - falcon-transfer
@@ -237,7 +237,7 @@ services:
 
   falcon-aggregator:
     container_name: falcon-aggregator
-    image: harbor.cloudminds.com/vbn/falcon-modules/falcon-aggregator:dt1.2.3
+    image: ${IMAGE_URL}falcon-aggregator:dt1.2.4
     restart: always
     depends_on:
       - falcon-mysql
@@ -290,7 +290,7 @@ services:
 
   falcon-alarm:
     container_name: falcon-alarm
-    image: harbor.cloudminds.com/vbn/falcon-modules/falcon-alarm:dt1.2.3
+    image: ${IMAGE_URL}falcon-alarm:dt1.2.4
     restart: always
     depends_on:
       - falcon-mysql
@@ -320,7 +320,7 @@ services:
 
 #  falcon-gateway:
 #    container_name: falcon-gateway
-#    image: harbor.cloudminds.com/vbn/falcon-modules/falcon-gateway:dt1.2.3
+#    image: ${IMAGE_URL}falcon-gateway:dt1.2.4
 #    restart: always
 #    depends_on:
 #      - falcon-transfer

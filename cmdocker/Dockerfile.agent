@@ -15,8 +15,10 @@ WORKDIR $FALCON_DIR
 RUN mv supervisord.conf.agent /etc/supervisord.conf && \
     rm -rf Dockerfile* *.zip
 
+
 EXPOSE 1988
 
-# Start
-#CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
-CMD ["/bin/sh", "-c", "./falconctl run"]
+# create config-files by ENV
+ENTRYPOINT ["./falcon-entry.sh"]
+
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
