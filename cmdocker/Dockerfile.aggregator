@@ -1,23 +1,22 @@
 FROM alpine:3.7 as aggregator
 USER root
 
-ENV FALCON_MODULES="aggregator" \
+ENV FALCON_MODULE="aggregator" \
     FALCON_DIR=/open-falcon 
 
 RUN mkdir -p $FALCON_DIR && \
-    mkdir -p $FALCON_DIR/logs && \
-    apk add --no-cache ca-certificates bash supervisor
+    apk add --no-cache bash
 
 COPY . $FALCON_DIR
 COPY ./zoneinfo.zip /usr/local/go/lib/time/ 
 WORKDIR $FALCON_DIR
 
-RUN mv supervisord.conf.aggregator /etc/supervisord.conf && \
-    rm -rf Dockerfile* *.zip
+RUN rm -rf Dockerfile* *.zip
 
 EXPOSE 6055
 
 # create config-files by ENV
 ENTRYPOINT ["./falcon-entry.sh"]
 
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+CMD ["/open-falcon/aggregator/bin/falcon-aggregator", "-c", \
+     "/open-falcon/aggregator/config/cfg.json"]

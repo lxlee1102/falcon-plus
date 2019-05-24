@@ -1,22 +1,22 @@
 FROM alpine:3.7 as hbs
 USER root
 
-ENV FALCON_MODULES="hbs" \
+ENV FALCON_MODULE="hbs" \
     FALCON_DIR=/open-falcon 
 
 RUN mkdir -p $FALCON_DIR && \
-    mkdir -p $FALCON_DIR/logs && \
-    apk add --no-cache ca-certificates bash supervisor
+    apk add --no-cache ca-certificates bash
 
 COPY . $FALCON_DIR
+COPY ./zoneinfo.zip /usr/local/go/lib/time/
 WORKDIR $FALCON_DIR
 
-RUN mv supervisord.conf.hbs /etc/supervisord.conf && \
-    rm -rf Dockerfile* *.zip
+RUN rm -rf Dockerfile* *.zip
 
 EXPOSE 6031 6030
 
 # create config-files by ENV
 ENTRYPOINT ["./falcon-entry.sh"]
 
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+CMD ["/open-falcon/hbs/bin/falcon-hbs", "-c", \
+     "/open-falcon/hbs/config/cfg.json"]

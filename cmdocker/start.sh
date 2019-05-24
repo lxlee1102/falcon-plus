@@ -1,6 +1,7 @@
 #!/bin/bash
 
 DB_PWD=test123456
+INS_D=/home/work
 
 start_graph() {
 	docker run -itd --name falcon-$1 \
@@ -9,14 +10,13 @@ start_graph() {
 		-p 6071:6071 \
 		-e MYSQL_PORT=root:$DB_PWD@tcp\(db.falcon:3306\) \
 		-e GRAPH_CLUSTER="\"g0\": \"127.0.0.1:6070\"" \
-		-v /home/work/open-falcon/data:/open-falcon/graph/data \
-		-v /home/work/open-falcon/logs:/open-falcon/logs \
+		-v ${INS_D}/open-falcon/data:/open-falcon/graph/data \
+		-v ${INS_D}/open-falcon/$1/config:/open-falcon/$1/config \
 		falcon-$1
 
 	docker ps -f name=$1
 
-	docker exec falcon-$1 ./falconctl start
-	docker exec falcon-$1 ps aux
+	docker exec falcon-$1 ps
 }
 
 start_hbs() {
@@ -25,12 +25,11 @@ start_hbs() {
 		-p 6030:6030 \
 		-p 6031:6031 \
 		-e MYSQL_PORT=root:$DB_PWD@tcp\(db.falcon:3306\) \
-		-v /home/work/open-falcon/logs:/open-falcon/logs \
+		-v ${INS_D}/open-falcon/$1/config:/open-falcon/$1/config \
 		falcon-$1
 
 	docker ps -f name=$1
 
-	docker exec falcon-$1 ./falconctl start
 	docker exec falcon-$1 ps aux
 }
 
@@ -43,12 +42,11 @@ start_judge() {
 		-p 6081:6081 \
 		-e HBS_PORT=hbs.falcon:6030 \
 		-e REDIS_PORT=redis.falcon:6379  \
-		-v /home/work/open-falcon/logs:/open-falcon/logs \
+		-v ${INS_D}/open-falcon/$1/config:/open-falcon/$1/config \
 		falcon-$1
 
 	docker ps -f name=$1
 
-	docker exec falcon-$1 ./falconctl start
 	docker exec falcon-$1 ps aux
 }
 
@@ -63,12 +61,11 @@ start_transfer() {
 		-e MYSQL_PORT=root:$DB_PWD@tcp\(db.falcon:3306\) \
 		-e GRAPH_CLUSTER="\"g01\": \"g01.falcon:6070\"" \
 		-e JUDGE_CLUSTER="\"j01\": \"j01.falcon:6080\"" \
-		-v /home/work/open-falcon/logs:/open-falcon/logs \
+		-v ${INS_D}/open-falcon/$1/config:/open-falcon/$1/config \
 		falcon-$1
 
 	docker ps -f name=$1
 
-	docker exec falcon-$1 ./falconctl start
 	docker exec falcon-$1 ps aux
 }
 
@@ -81,12 +78,11 @@ start_api() {
 		-p 8080:8080 \
 		-e MYSQL_PORT=root:$DB_PWD@tcp\(db.falcon:3306\) \
 		-e GRAPH_CLUSTER="\"g01\": \"g01.falcon:6070\"" \
-		-v /home/work/open-falcon/logs:/open-falcon/logs \
+		-v ${INS_D}/open-falcon/$1/config:/open-falcon/$1/config \
 		falcon-$1
 
 	docker ps -f name=$1
 
-	docker exec falcon-$1 ./falconctl start
 	docker exec falcon-$1 ps aux
 }
 
@@ -99,12 +95,11 @@ start_nodata() {
 		-e MYSQL_PORT=root:$DB_PWD@tcp\(db.falcon:3306\) \
 		-e PLUS_API=http:\\/\\/api.falcon:8080 \
 		-e TRANSFER_PORT=transfer.falcon:6060 \
-		-v /home/work/open-falcon/logs:/open-falcon/logs \
+		-v ${INS_D}/open-falcon/$1/config:/open-falcon/$1/config \
 		falcon-$1
 
 	docker ps -f name=$1
 
-	docker exec falcon-$1 ./falconctl start
 	docker exec falcon-$1 ps aux
 }
 
@@ -117,12 +112,11 @@ start_aggregator() {
 		-e MYSQL_PORT=root:$DB_PWD@tcp\(db.falcon:3306\) \
 		-e PLUS_API=http:\\/\\/api.falcon:8080 \
 		-e PUSH_API=http:\\/\\/agent.falcon:1988\\/v1\\/push \
-		-v /home/work/open-falcon/logs:/open-falcon/logs \
+		-v ${INS_D}/open-falcon/$1/config:/open-falcon/$1/config \
 		falcon-$1
 
 	docker ps -f name=$1
 
-	docker exec falcon-$1 ./falconctl start
 	docker exec falcon-$1 ps aux
 }
 
@@ -158,11 +152,11 @@ start_mail() {
 		-e USERNAME=test@cloudminds.com \
 		-e PASSWD=test123 \
 		-e FROM=noc@cloudminds.com \
-		-v /home/work/open-falcon/logs:/open-falcon/logs \
+		-v ${INS_D}/open-falcon/$1/config:/open-falcon/$1/config \
 		falcon-mail
 
-	docker exec falcon-$1 ./falconctl start
 	docker ps -f name=$1
+	docker exec falcon-$1 ps aux
 }
 
 
@@ -179,12 +173,11 @@ start_alarm() {
 		-e PLUS_API=http:\\/\\/api.falcon:8080 \
 		-e MAIL_API=http:\\/\\/mail.falcon:4000\\/sender\\/mail \
 		-e DASHBOARD=http:\\/\\/dashboard.falcon:8081 \
-		-v /home/work/open-falcon/logs:/open-falcon/logs \
+		-v ${INS_D}/open-falcon/$1/config:/open-falcon/$1/config \
 		falcon-$1
 
 	docker ps -f name=$1
 
-	docker exec falcon-$1 ./falconctl start
 	docker exec falcon-$1 ps aux
 }
 
@@ -195,12 +188,11 @@ start_gateway() {
 		-p 18433:18433 \
 		-p 14444:14444 \
 		-e TRANSFER_CLUSTER="\"t01\": \"t01.falcon:8433\"" \
-		-v /home/work/open-falcon/logs:/open-falcon/logs \
+		-v ${INS_D}/open-falcon/$1/config:/open-falcon/$1/config \
 		falcon-$1
 
 	docker ps -f name=$1
 
-	docker exec falcon-$1 ./falconctl start
 	docker exec falcon-$1 ps aux
 }
 
@@ -212,12 +204,11 @@ start_agent() {
 		-e TRANSFER_RPC="\"t01.falcon:8433\"" \
 		-e HBS_PORT=hbs.falcon:6030 \
 		-e HOSTNAME=dockeragent01 \
-		-v /home/work/open-falcon/logs:/open-falcon/logs \
+		-v ${INS_D}/open-falcon/$1/config:/open-falcon/$1/config \
 		falcon-$1
 
 	docker ps -f name=$1
 
-	docker exec falcon-$1 ./falconctl start
 	docker exec falcon-$1 ps aux
 }
 

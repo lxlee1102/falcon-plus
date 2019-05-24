@@ -120,52 +120,47 @@ reset_agent_cfg() {
 
 reset_configs() {
 
-	for m in $FALCON_MODULES
-	do
-		case $m in
-			"graph")
-				reset_graph_cfg
-				;;
-			"hbs")
-				reset_hbs_cfg
-				;;
-			"judge")
-				reset_judge_cfg
-				;;
-			"transfer")
-				reset_transfer_cfg
-				;;
-			"api")
-				reset_api_cfg
-				;;
-			"nodata")
-				reset_nodata_cfg
-				;;
-			"aggregator")
-				reset_aggregator_cfg
-				;;
-			"alarm")
-				reset_alarm_cfg
-				;;
-			"gateway")
-				reset_gateway_cfg
-				;;
-			"agent")
-				reset_agent_cfg
-				;;
-			*)
-				;;
-		esac
-	done
+	m=$FALCON_MODULE
+	case $m in
+		"graph")
+			reset_graph_cfg
+			;;
+		"hbs")
+			reset_hbs_cfg
+			;;
+		"judge")
+			reset_judge_cfg
+			;;
+		"transfer")
+			reset_transfer_cfg
+			;;
+		"api")
+			reset_api_cfg
+			;;
+		"nodata")
+			reset_nodata_cfg
+			;;
+		"aggregator")
+			reset_aggregator_cfg
+			;;
+		"alarm")
+			reset_alarm_cfg
+			;;
+		"gateway")
+			reset_gateway_cfg
+			;;
+		"agent")
+			reset_agent_cfg
+			;;
+		*)
+			;;
+	esac
 }
 
 # init-config
-for m in $FALCON_MODULES
-do
-	if [ ! -f $DOCKER_DIR/$m/config/cfg.json ]; then
-		reset_configs
-		break;
-	fi
-done
+m=$FALCON_MODULE
+if [ ! -f $DOCKER_DIR/$m/config/cfg.json ]; then
+	reset_configs
+fi
 
 exec "$@"

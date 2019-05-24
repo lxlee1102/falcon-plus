@@ -1,19 +1,17 @@
 FROM alpine:3.7 as agent
 USER root
 
-ENV FALCON_MODULES="agent" \
+ENV FALCON_MODULE="agent" \
     FALCON_DIR=/open-falcon 
 
 RUN mkdir -p $FALCON_DIR && \
-    mkdir -p $FALCON_DIR/logs && \
-    apk add --no-cache ca-certificates bash git supervisor
+    apk add --no-cache ca-certificates bash git
 
 COPY . $FALCON_DIR
 COPY ./zoneinfo.zip /usr/local/go/lib/time/ 
 WORKDIR $FALCON_DIR
 
-RUN mv supervisord.conf.agent /etc/supervisord.conf && \
-    rm -rf Dockerfile* *.zip
+RUN rm -rf Dockerfile* *.zip
 
 
 EXPOSE 1988
@@ -21,4 +19,5 @@ EXPOSE 1988
 # create config-files by ENV
 ENTRYPOINT ["./falcon-entry.sh"]
 
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+CMD ["/open-falcon/agent/bin/falcon-agent", "-c", \
+     "/open-falcon/agent/config/cfg.json"]

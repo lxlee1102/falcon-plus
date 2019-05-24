@@ -1,22 +1,22 @@
 FROM alpine:3.7 as graph
 USER root
 
-ENV FALCON_MODULES="graph" \
+ENV FALCON_MODULE="graph" \
     FALCON_DIR=/open-falcon 
 
 RUN mkdir -p $FALCON_DIR && \
     mkdir -p $FALCON_DIR/logs && \
-    apk add --no-cache ca-certificates bash supervisor
+    apk add --no-cache ca-certificates bash
 
 COPY . $FALCON_DIR
 WORKDIR $FALCON_DIR
 
-RUN mv supervisord.conf.graph /etc/supervisord.conf && \
-    rm -rf Dockerfile* *.zip
+RUN rm -rf Dockerfile* *.zip
 
 EXPOSE 6071 6070
 
 # create config-files by ENV
 ENTRYPOINT ["./falcon-entry.sh"]
 
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+CMD ["/open-falcon/graph/bin/falcon-graph", "-c", \
+     "/open-falcon/graph/config/cfg.json"]
