@@ -6,18 +6,15 @@ ENV FALCON_MODULE="alarm" \
 
 RUN mkdir -p $FALCON_DIR && \
     mkdir -p $FALCON_DIR/logs && \
-    apk add --no-cache bash
+    apk add --no-cache bash util-linux
 
 COPY . $FALCON_DIR
 COPY ./zoneinfo.zip /usr/local/go/lib/time/ 
 WORKDIR $FALCON_DIR
 
-RUN rm -rf Dockerfile*  *.zip
+RUN rm -rf Dockerfile*  *.zip && \
+    mv localtime.shanghai /etc/localtime
 
 EXPOSE 9912
 
-# create config-files by ENV
-ENTRYPOINT ["./falcon-entry.sh"]
-
-CMD ["/open-falcon/alarm/bin/falcon-alarm", "-c", \
-     "/open-falcon/alarm/config/cfg.json"]
+CMD ["./falcon-entry.sh"]

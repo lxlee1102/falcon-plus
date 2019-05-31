@@ -6,19 +6,16 @@ ENV FALCON_MODULE="gateway" \
 
 RUN mkdir -p $FALCON_DIR && \
     mkdir -p $FALCON_DIR/logs && \
-    apk add --no-cache ca-certificates bash
+    apk add --no-cache ca-certificates bash util-linux
 
 COPY . $FALCON_DIR
 COPY ./zoneinfo.zip /usr/local/go/lib/time/
 WORKDIR $FALCON_DIR
 
-RUN rm -rf Dockerfile*
+RUN rm -rf Dockerfile* *.zip && \
+    mv localtime.shanghai /etc/localtime
 
 EXPOSE 16060 18433 14444
 
-# create config-files by ENV
-ENTRYPOINT ["./falcon-entry.sh"]
-
-CMD ["/open-falcon/gateway/bin/falcon-gateway", "-c", \
-     "/open-falcon/gateway/config/cfg.json"]
+CMD ["./falcon-entry.sh"]
 

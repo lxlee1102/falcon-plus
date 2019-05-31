@@ -52,7 +52,7 @@
         "mem.swapfree": true
     },
     "mcstenant": {
-        "enabled": true,
+        "enabled": false,
         "ttl": 120,
         "dir": "/etc/openvpn",
         "suffix": ".conf",

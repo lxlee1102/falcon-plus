@@ -36,9 +36,12 @@ services:
 
   falcon-mail:
     container_name: falcon-mail
-    image: ${IMAGE_URL}falcon-mail:dt1.2.5.sp
+    image: ${IMAGE_URL}falcon-mail:dt1.2.6.sp
     restart: always
     environment:
+#      SYSLOG_SERVER_ADDR: logserver.falcon
+#      SYSLOG_SERVER_PORT: 514
+#      SYSLOG_SERVER_TCP: true
       SMTP_TYPE: smtp_ssl
       SMTP_SERVER: smtp.exmail.qq.com
       SMTP_PORT: 465
@@ -82,13 +85,16 @@ services:
 
   falcon-graph:
     container_name: falcon-graph
-    image: ${IMAGE_URL}falcon-graph:dt1.2.5.sp
+    image: ${IMAGE_URL}falcon-graph:dt1.2.6.sp
     restart: always
     depends_on:
       - falcon-mysql
     links:
       - falcon-mysql:db.falcon
     environment:
+#      SYSLOG_SERVER_ADDR: logserver.falcon
+#      SYSLOG_SERVER_PORT: 514
+#      SYSLOG_SERVER_TCP: true
       MYSQL_PORT: root:Pwd123456@tcp\(db.falcon:3306\)
       GRAPH_CLUSTER: "\"g0\": \"127.0.0.1:6070\""
     volumes:
@@ -103,13 +109,16 @@ services:
 
   falcon-hbs:
     container_name: falcon-hbs
-    image: ${IMAGE_URL}falcon-hbs:dt1.2.5.sp
+    image: ${IMAGE_URL}falcon-hbs:dt1.2.6.sp
     restart: always
     depends_on:
       - falcon-mysql
     links:
       - falcon-mysql:db.falcon
     environment:
+#      SYSLOG_SERVER_ADDR: logserver.falcon
+#      SYSLOG_SERVER_PORT: 514
+#      SYSLOG_SERVER_TCP: true
       MYSQL_PORT: root:Pwd123456@tcp\(db.falcon:3306\)
     volumes:
       - /etc/localtime:/etc/localtime
@@ -123,7 +132,7 @@ services:
   
   falcon-judge:
     container_name: falcon-judge
-    image: ${IMAGE_URL}falcon-judge:dt1.2.5.sp
+    image: ${IMAGE_URL}falcon-judge:dt1.2.6.sp
     restart: always
     depends_on:
       - falcon-redis
@@ -132,6 +141,9 @@ services:
       - falcon-redis:redis.falcon
       - falcon-hbs:hbs.falcon
     environment:
+#      SYSLOG_SERVER_ADDR: logserver.falcon
+#      SYSLOG_SERVER_PORT: 514
+#      SYSLOG_SERVER_TCP: true
       HBS_PORT: hbs.falcon:6030
       REDIS_PORT: redis.falcon:6379
     volumes:
@@ -145,7 +157,7 @@ services:
 
   falcon-transfer:
     container_name: falcon-transfer
-    image: ${IMAGE_URL}falcon-transfer:dt1.2.5.sp
+    image: ${IMAGE_URL}falcon-transfer:dt1.2.6.sp
     restart: always
     depends_on:
       - falcon-mysql
@@ -156,6 +168,9 @@ services:
       - falcon-graph:g01.falcon
       - falcon-judge:j01.falcon
     environment:
+#      SYSLOG_SERVER_ADDR: logserver.falcon
+#      SYSLOG_SERVER_PORT: 514
+#      SYSLOG_SERVER_TCP: true
       MYSQL_PORT: root:Pwd123456@tcp\(db.falcon:3306\)
       GRAPH_CLUSTER: "\"g01\": \"g01.falcon:6070\""
       JUDGE_CLUSTER: "\"j01\": \"j01.falcon:6080\""
@@ -171,7 +186,7 @@ services:
 
   falcon-api:
     container_name: falcon-api
-    image: ${IMAGE_URL}falcon-api:dt1.2.5.sp
+    image: ${IMAGE_URL}falcon-api:dt1.2.6.sp
     restart: always
     depends_on:
       - falcon-mysql
@@ -180,6 +195,9 @@ services:
       - falcon-mysql:db.falcon
       - falcon-graph:g01.falcon
     environment:
+#      SYSLOG_SERVER_ADDR: logserver.falcon
+#      SYSLOG_SERVER_PORT: 514
+#      SYSLOG_SERVER_TCP: true
       MYSQL_PORT: root:Pwd123456@tcp\(db.falcon:3306\)
       GRAPH_CLUSTER: "\"g01\": \"g01.falcon:6070\""
     volumes:
@@ -192,7 +210,7 @@ services:
 
   falcon-nodata:
     container_name: falcon-nodata
-    image: ${IMAGE_URL}falcon-nodata:dt1.2.5.sp
+    image: ${IMAGE_URL}falcon-nodata:dt1.2.6.sp
     restart: always
     depends_on:
       - falcon-mysql
@@ -203,6 +221,9 @@ services:
       - falcon-transfer:transfer.falcon
       - falcon-api:api.falcon
     environment:
+#      SYSLOG_SERVER_ADDR: logserver.falcon
+#      SYSLOG_SERVER_PORT: 514
+#      SYSLOG_SERVER_TCP: true
       MYSQL_PORT: root:Pwd123456@tcp\(db.falcon:3306\)
       PLUS_API: http:\\/\\/api.falcon:8080
       TRANSFER_PORT: transfer.falcon:6060
@@ -216,7 +237,7 @@ services:
 
   falcon-agent:
     container_name: falcon-agent
-    image: ${IMAGE_URL}falcon-agent:dt1.2.5.sp
+    image: ${IMAGE_URL}falcon-agent:dt1.2.6.sp
     restart: always
     depends_on:
       - falcon-transfer
@@ -225,6 +246,9 @@ services:
       - falcon-transfer:t01.falcon
       - falcon-hbs:hbs.falcon
     environment:
+#      SYSLOG_SERVER_ADDR: logserver.falcon
+#      SYSLOG_SERVER_PORT: 514
+#      SYSLOG_SERVER_TCP: true
       HBS_PORT: hbs.falcon:6030
       TRANSFER_RPC: "\"t01.falcon:8433\""
       #     TRANSFER_RPC: "\"t01.falcon:8433\", \"t02.falcon:8433\""
@@ -237,7 +261,7 @@ services:
 
   falcon-aggregator:
     container_name: falcon-aggregator
-    image: ${IMAGE_URL}falcon-aggregator:dt1.2.5.sp
+    image: ${IMAGE_URL}falcon-aggregator:dt1.2.6.sp
     restart: always
     depends_on:
       - falcon-mysql
@@ -248,6 +272,9 @@ services:
       - falcon-api:api.falcon
       - falcon-agent:agent.falcon
     environment:
+#      SYSLOG_SERVER_ADDR: logserver.falcon
+#      SYSLOG_SERVER_PORT: 514
+#      SYSLOG_SERVER_TCP: true
       MYSQL_PORT: root:Pwd123456@tcp\(db.falcon:3306\)
       PLUS_API: http:\\/\\/api.falcon:8080
       PUSH_API: http:\\/\\/agent.falcon:1988\\/v1\\/push
@@ -290,7 +317,7 @@ services:
 
   falcon-alarm:
     container_name: falcon-alarm
-    image: ${IMAGE_URL}falcon-alarm:dt1.2.5.sp
+    image: ${IMAGE_URL}falcon-alarm:dt1.2.6.sp
     restart: always
     depends_on:
       - falcon-mysql
@@ -305,6 +332,9 @@ services:
       - falcon-mail:mail.falcon
       - falcon-dashboard:dashboard.falcon
     environment:
+#      SYSLOG_SERVER_ADDR: logserver.falcon
+#      SYSLOG_SERVER_PORT: 514
+#      SYSLOG_SERVER_TCP: true
       MYSQL_PORT: root:Pwd123456@tcp\(db.falcon:3306\)
       REDIS_PORT: redis.falcon:6379
       PLUS_API: http:\\/\\/api.falcon:8080
@@ -320,13 +350,16 @@ services:
 
 #  falcon-gateway:
 #    container_name: falcon-gateway
-#    image: ${IMAGE_URL}falcon-gateway:dt1.2.5.sp
+#    image: ${IMAGE_URL}falcon-gateway:dt1.2.6.sp
 #    restart: always
 #    depends_on:
 #      - falcon-transfer
 #    links:
 #      - falcon-transfer:t01.falcon
 #    environment:
+#      SYSLOG_SERVER_ADDR: logserver.falcon
+#      SYSLOG_SERVER_PORT: 514
+#      SYSLOG_SERVER_TCP: true
 #      TRANSFER_CLUSTER: "\"t01\": \"t01.falcon:8433\""
 #    volumes:
 #      - /etc/localtime:/etc/localtime

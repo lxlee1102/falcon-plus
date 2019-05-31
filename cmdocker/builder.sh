@@ -40,7 +40,7 @@ build_agent() {
 
 	tar -zxf ../open-falcon-v*.tar.gz -C ./out ./$PROG ./public ./plugin  && rm -f ./out/$PROG/config/cfg.json
 	cp ./config/$PROG.tpl ./out/$PROG/
-	cp ./falcon-entry.sh ./Dockerfile.$PROG ./zoneinfo.zip ./out/
+	cp ./falcon-entry.sh ./localtime.shanghai ./Dockerfile.$PROG ./zoneinfo.zip ./out/
 	if [ $? != 0 ]; then
 		exit 1;
 	fi
@@ -58,7 +58,7 @@ build_module() {
 
 	tar -zxf ../open-falcon-v*.tar.gz -C ./out ./$PROG  && rm -f ./out/$PROG/config/cfg.json
 	cp ./config/$PROG.tpl ./out/$PROG/
-	cp ./falcon-entry.sh ./Dockerfile.$PROG ./zoneinfo.zip ./out/
+	cp ./falcon-entry.sh ./localtime.shanghai ./Dockerfile.$PROG ./zoneinfo.zip ./out/
 	if [ $? != 0 ]; then
 		exit 1;
 	fi

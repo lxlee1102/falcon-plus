@@ -6,18 +6,15 @@ ENV FALCON_MODULE="api" \
 
 RUN mkdir -p $FALCON_DIR && \
     mkdir -p $FALCON_DIR/logs && \
-    apk add --no-cache ca-certificates bash
+    apk add --no-cache ca-certificates bash util-linux
 
 COPY . $FALCON_DIR
 COPY ./zoneinfo.zip /usr/local/go/lib/time/
 WORKDIR $FALCON_DIR
 
-RUN rm -rf Dockerfile* *.zip
+RUN rm -rf Dockerfile* *.zip && \
+    mv localtime.shanghai /etc/localtime
 
 EXPOSE 8080
 
-# create config-files by ENV
-ENTRYPOINT ["./falcon-entry.sh"]
-
-CMD ["/open-falcon/api/bin/falcon-api", "-c", \
-     "/open-falcon/api/config/cfg.json"]
+CMD ["./falcon-entry.sh"]

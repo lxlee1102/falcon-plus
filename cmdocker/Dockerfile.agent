@@ -5,19 +5,20 @@ ENV FALCON_MODULE="agent" \
     FALCON_DIR=/open-falcon 
 
 RUN mkdir -p $FALCON_DIR && \
-    apk add --no-cache ca-certificates bash git
+    mkdir -p $FALCON_DIR/logs && \
+    apk add --no-cache ca-certificates bash git util-linux
 
 COPY . $FALCON_DIR
 COPY ./zoneinfo.zip /usr/local/go/lib/time/ 
 WORKDIR $FALCON_DIR
 
-RUN rm -rf Dockerfile* *.zip
+RUN rm -rf Dockerfile* *.zip && \
+    mv localtime.shanghai /etc/localtime
 
+# mv logrotate.falcon /etc/logrotate.d/falcon && \
 
 EXPOSE 1988
 
 # create config-files by ENV
-ENTRYPOINT ["./falcon-entry.sh"]
-
-CMD ["/open-falcon/agent/bin/falcon-agent", "-c", \
-     "/open-falcon/agent/config/cfg.json"]
+#ENTRYPOINT ["./falcon-entry.sh"]
+CMD ["./falcon-entry.sh"]
