@@ -65,6 +65,8 @@ pack: checkbin
 	@(cd ./out && ln -s ./agent/public/ ./public)
 	@(cd ./out && mkdir -p ./agent/plugin && ln -s ./agent/plugin/ ./plugin)
 	@cp -r ./modules/api/data ./out/api/
+	@mkdir ./out/scripts
+	@cp -r ./scripts/*.sh ./out/scripts/
 	@mkdir out/graph/data
 	@bash ./config/confgen.sh
 	@cp $(TARGET) ./out/$(TARGET)
