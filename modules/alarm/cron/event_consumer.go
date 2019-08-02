@@ -58,12 +58,12 @@ func consumeHighEvents(event *cmodel.Event, action *api.Action) {
 	mailContent := GenerateMailContent(event)
 	imContent := GenerateIMContent(event)
 
-	// <=P2 才发送短信
+	// <=P2 才发送短信  and im
 	if event.Priority() < 3 {
 		redi.WriteSms(phones, smsContent)
+		redi.WriteIM(ims, imContent)
 	}
 
-	redi.WriteIM(ims, imContent)
 	redi.WriteMail(mails, smsContent, mailContent)
 
 }
@@ -74,12 +74,12 @@ func consumeLowEvents(event *cmodel.Event, action *api.Action) {
 		return
 	}
 
-	// <=P2 才发送短信
+	// <=P2 才发送短信 and im
 	if event.Priority() < 3 {
 		ParseUserSms(event, action)
+		ParseUserIm(event, action)
 	}
 
-	ParseUserIm(event, action)
 	ParseUserMail(event, action)
 }
 
