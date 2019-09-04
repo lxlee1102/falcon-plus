@@ -15,12 +15,13 @@
 package cron
 
 import (
+	"time"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/open-falcon/falcon-plus/modules/alarm/g"
 	"github.com/open-falcon/falcon-plus/modules/alarm/model"
 	"github.com/open-falcon/falcon-plus/modules/alarm/redi"
 	"github.com/toolkits/net/httplib"
-	"time"
 )
 
 func ConsumeIM() {
@@ -47,6 +48,10 @@ func SendIM(im *model.IM) {
 	}()
 
 	url := g.Config().Api.IM
+	if url == "" {
+		log.Debugf("send IM: ignore, cause of null url.")
+		return
+	}
 	r := httplib.Post(url).SetTimeout(5*time.Second, 30*time.Second)
 	r.Param("tos", im.Tos)
 	r.Param("content", im.Content)

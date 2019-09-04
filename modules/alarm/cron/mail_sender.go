@@ -15,12 +15,13 @@
 package cron
 
 import (
+	"time"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/open-falcon/falcon-plus/modules/alarm/g"
 	"github.com/open-falcon/falcon-plus/modules/alarm/model"
 	"github.com/open-falcon/falcon-plus/modules/alarm/redi"
 	"github.com/toolkits/net/httplib"
-	"time"
 )
 
 func ConsumeMail() {
@@ -47,6 +48,10 @@ func SendMail(mail *model.Mail) {
 	}()
 
 	url := g.Config().Api.Mail
+	if url == "" {
+		log.Debugf("send mail: ignore, cause of null url.")
+		return
+	}
 	r := httplib.Post(url).SetTimeout(5*time.Second, 30*time.Second)
 	r.Param("tos", mail.Tos)
 	r.Param("subject", mail.Subject)
