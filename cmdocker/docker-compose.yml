@@ -340,6 +340,7 @@ services:
       PLUS_API: http:\\/\\/api.falcon:8080
       MAIL_API: http:\\/\\/mail.falcon:4000\\/sender\\/mail
       DASHBOARD: http:\\/\\/dashboard.falcon:8081
+#      DEPLOY_ENV: dev
     volumes:
       - /etc/localtime:/etc/localtime
       - ${PWD}/open-falcon/alarm/config:/open-falcon/alarm/config

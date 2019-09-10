@@ -1,5 +1,6 @@
 {
     "log_level": "info",
+    "deploy_env": "%%DEPLOY_ENV%%",
     "http": {
         "enabled": true,
         "listen": "0.0.0.0:9912"

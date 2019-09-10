@@ -101,6 +101,7 @@ reset_alarm_cfg() {
 	find $DOCKER_DIR/$PROG/config/*.json -type f -exec sed -i "s/%%DASHBOARD%%/$DASHBOARD/g" {} \;
 	find $DOCKER_DIR/$PROG/config/*.json -type f -exec sed -i "s/%%PLUS_API%%/$PLUS_API/g" {} \;
 	find $DOCKER_DIR/$PROG/config/*.json -type f -exec sed -i "s/%%MYSQL%%/$MYSQL_PORT/g" {} \;
+	find $DOCKER_DIR/$PROG/config/*.json -type f -exec sed -i "s/%%DEPLOY_ENV%%/$DEPLOY_ENV/g" {} \;
 }
 
 reset_gateway_cfg() {
