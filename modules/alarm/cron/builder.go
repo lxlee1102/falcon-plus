@@ -23,11 +23,16 @@ import (
 )
 
 func BuildCommonSMSContent(event *model.Event) string {
+	endpoint := event.Endpoint
+	env := g.Config().DeployENV
+	if env != "" {
+		endpoint = fmt.Sprintf("%s/%s", env, event.Endpoint)
+	}
 	return fmt.Sprintf(
 		"[P%d][%s][%s][][%s %s %s %s %s%s%s][O%d %s]",
 		event.Priority(),
 		event.Status,
-		event.Endpoint,
+		endpoint,
 		event.Note(),
 		event.Func(),
 		event.Metric(),
@@ -41,11 +46,16 @@ func BuildCommonSMSContent(event *model.Event) string {
 }
 
 func BuildCommonIMContent(event *model.Event) string {
+	endpoint := event.Endpoint
+	env := g.Config().DeployENV
+	if env != "" {
+		endpoint = fmt.Sprintf("%s/%s", env, event.Endpoint)
+	}
 	return fmt.Sprintf(
 		"[P%d][%s][%s][][%s %s %s %s %s%s%s][O%d %s]",
 		event.Priority(),
 		event.Status,
-		event.Endpoint,
+		endpoint,
 		event.Note(),
 		event.Func(),
 		event.Metric(),
@@ -59,12 +69,17 @@ func BuildCommonIMContent(event *model.Event) string {
 }
 
 func BuildCommonMailContent(event *model.Event) string {
+	endpoint := event.Endpoint
+	env := g.Config().DeployENV
+	if env != "" {
+		endpoint = fmt.Sprintf("%s/%s", env, event.Endpoint)
+	}
 	link := g.Link(event)
 	return fmt.Sprintf(
 		"%s\r\nP%d\r\nEndpoint:%s\r\nMetric:%s\r\nTags:%s\r\n%s: %s%s%s\r\nNote:%s\r\nMax:%d, Current:%d\r\nTimestamp:%s\r\n%s\r\n",
 		event.Status,
 		event.Priority(),
-		event.Endpoint,
+		endpoint,
 		event.Metric(),
 		utils.SortedTags(event.PushedTags),
 		event.Func(),
@@ -79,6 +94,22 @@ func BuildCommonMailContent(event *model.Event) string {
 	)
 }
 
+func BuildCommonMailSubject(event *model.Event) string {
+	endpoint := event.Endpoint
+	env := g.Config().DeployENV
+	if env != "" {
+		endpoint = fmt.Sprintf("%s/%s", env, event.Endpoint)
+	}
+
+	return fmt.Sprintf(
+		"[P%d][%s][%s][][%s]",
+		event.Priority(),
+		event.Status,
+		endpoint,
+		event.Note(),
+	)
+}
+
 func GenerateSmsContent(event *model.Event) string {
 	return BuildCommonSMSContent(event)
 }
@@ -89,4 +120,8 @@ func GenerateMailContent(event *model.Event) string {
 
 func GenerateIMContent(event *model.Event) string {
 	return BuildCommonIMContent(event)
+}
+
+func GenerateMailSubject(event *model.Event) string {
+	return BuildCommonMailSubject(event)
 }

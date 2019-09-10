@@ -16,6 +16,7 @@ package cron
 
 import (
 	"encoding/json"
+
 	log "github.com/Sirupsen/logrus"
 
 	cmodel "github.com/open-falcon/falcon-plus/common/model"
@@ -57,6 +58,7 @@ func consumeHighEvents(event *cmodel.Event, action *api.Action) {
 	smsContent := GenerateSmsContent(event)
 	mailContent := GenerateMailContent(event)
 	imContent := GenerateIMContent(event)
+	mailSubject := GenerateMailSubject(event)
 
 	// <=P2 才发送短信  and im
 	if event.Priority() < 3 {
@@ -64,7 +66,7 @@ func consumeHighEvents(event *cmodel.Event, action *api.Action) {
 		redi.WriteIM(ims, imContent)
 	}
 
-	redi.WriteMail(mails, smsContent, mailContent)
+	redi.WriteMail(mails, mailSubject, mailContent)
 
 }
 
@@ -121,7 +123,8 @@ func ParseUserMail(event *cmodel.Event, action *api.Action) {
 	userMap := api.GetUsers(action.Uic)
 
 	metric := event.Metric()
-	subject := GenerateSmsContent(event)
+	//	subject := GenerateSmsContent(event)
+	subject := GenerateMailSubject(event)
 	content := GenerateMailContent(event)
 	status := event.Status
 	priority := event.Priority()

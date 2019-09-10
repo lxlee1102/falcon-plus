@@ -65,6 +65,7 @@ type HousekeeperConfig struct {
 
 type GlobalConfig struct {
 	LogLevel     string              `json:"log_level"`
+	DeployENV    string              `json:"deploy_env"`
 	FalconPortal *FalconPortalConfig `json:"falcon_portal"`
 	Http         *HttpConfig         `json:"http"`
 	Redis        *RedisConfig        `json:"redis"`
