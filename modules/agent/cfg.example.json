@@ -29,7 +29,7 @@
         "backdoor": false
     },
     "collector": {
-        "ifacePrefix": ["eth", "em"],
+        "ifacePrefix": [],
         "mountPoint": []
     },
     "default_tags": {

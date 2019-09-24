@@ -1,5 +1,5 @@
 {
-    "debug": true,
+    "debug": false,
     "hostname": "",
     "ip": "",
     "plugin": {
@@ -28,7 +28,7 @@
         "backdoor": false
     },
     "collector": {
-        "ifacePrefix": ["eth", "em"],
+        "ifacePrefix": [],
         "mountPoint": []
     },
     "default_tags": {
