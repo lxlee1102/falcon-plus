@@ -16,6 +16,7 @@ package cron
 
 import (
 	"errors"
+	"fmt"
 	"regexp"
 	"strconv"
 )
@@ -29,7 +30,7 @@ func compute(operands []string, operators []string, computeMode string, hostname
 
 	vals := queryOperands(operands, hostname, valMap)
 	if len(vals) != count {
-		return val, errors.New("value invalid")
+		return val, fmt.Errorf("value invalid: need count %d, but values %v", count, vals)
 	}
 
 	sum := vals[0]
