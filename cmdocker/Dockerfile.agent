@@ -1,12 +1,14 @@
-FROM alpine:3.7 as agent
+FROM harbor.cloudminds.com/library/alpine:3.CM-Beta-1.3
 USER root
+
+ENV PROJECT=mcs MODULE=falcon-agent LOGPATH=
 
 ENV FALCON_MODULE="agent" \
     FALCON_DIR=/open-falcon 
 
 RUN mkdir -p $FALCON_DIR && \
     mkdir -p $FALCON_DIR/logs && \
-    apk add --no-cache ca-certificates bash git util-linux
+    apk add --no-cache ca-certificates bash git util-linux  tcpdump busybox-extras
 
 COPY . $FALCON_DIR
 COPY ./zoneinfo.zip /usr/local/go/lib/time/ 

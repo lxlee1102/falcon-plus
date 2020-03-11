@@ -1,11 +1,13 @@
-FROM alpine:3.7 as nodata
+FROM harbor.cloudminds.com/library/alpine:3.CM-Beta-1.3
 USER root
+
+ENV PROJECT=mcs MODULE=falcon-nodata LOGPATH=
 
 ENV FALCON_MODULE="nodata" \
     FALCON_DIR=/open-falcon 
 
 RUN mkdir -p $FALCON_DIR && \
-    apk add --no-cache ca-certificates bash util-linux
+    apk add --no-cache ca-certificates bash util-linux tcpdump busybox-extras
 
 COPY . $FALCON_DIR
 COPY ./zoneinfo.zip /usr/local/go/lib/time/
