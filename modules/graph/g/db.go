@@ -16,9 +16,11 @@ package g
 
 import (
 	"database/sql"
-	_ "github.com/go-sql-driver/mysql"
 	"log"
 	"sync"
+	"time"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 // TODO 草草的写了一个db连接池,优化下
@@ -74,6 +76,8 @@ func makeDbConn() (conn *sql.DB, err error) {
 	}
 
 	conn.SetMaxIdleConns(Config().DB.MaxIdle)
+	conn.SetConnMaxLifetime(time.Second * time.Duration(Config().DB.ConnMaxLife))
+
 	err = conn.Ping()
 
 	return conn, err

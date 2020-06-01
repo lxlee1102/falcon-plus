@@ -16,8 +16,9 @@ package index
 
 import (
 	"database/sql"
-	log "github.com/Sirupsen/logrus"
 	"time"
+
+	log "github.com/Sirupsen/logrus"
 
 	nsema "github.com/toolkits/concurrent/semaphore"
 	ntime "github.com/toolkits/time"
@@ -58,7 +59,7 @@ func updateIndexIncr() int {
 
 	dbConn, err := g.GetDbConn("UpdateIndexIncrTask")
 	if err != nil {
-		log.Error("[ERROR] get dbConn fail", err)
+		log.Error("[ERROR] get dbConn fail ", err)
 		return ret
 	}
 
